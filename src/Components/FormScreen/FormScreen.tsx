@@ -1,0 +1,142 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { questions } from "../../data/appData";
+import type { Answers } from "../../types/Answers";
+import { Flower } from "../Flower";
+import { FormStep } from "../FormStep";
+import { ChevronRight } from '@mui/icons-material';
+import { Button, Typography } from '@mui/material';
+import './FormScreen.scss';
+import type { Question } from '../../types/Question';
+import React from 'react';
+
+// A helper function to group questions into logical sections
+// const groupQuestions = (allQuestions: Question[]) => {
+//     const sections: { title: string; questions: Question[] }[] = [];
+
+//     // Define the sections and the question IDs that belong to them
+//     const sectionMapping = {
+//         'שם': ['name'],
+//         'זהות מגדרית': ['genderIdentity'],
+//         'מוצא': ['origin_p1_grandpa', 'origin_p1_grandma', 'origin_p2_grandpa', 'origin_p2_grandma'],
+//         'שייכות': ['belonging'],
+//         // The rest of the questions will be grouped under their own label
+//     };
+
+//     const addedQuestionIds = new Set<string>();
+
+//     // Create the main defined sections
+//     for (const [title, ids] of Object.entries(sectionMapping)) {
+//         const questionsInSection = ids.map(id => allQuestions.find(q => q.id === id)).filter(Boolean) as Question[];
+//         if (questionsInSection.length > 0) {
+//             sections.push({ title, questions: questionsInSection });
+//             ids.forEach(id => addedQuestionIds.add(id));
+//         }
+//     }
+
+//     // Add remaining questions as their own sections
+//     allQuestions.forEach(q => {
+//         if (!addedQuestionIds.has(q.id)) {
+//             sections.push({ title: q.label, questions: [q] });
+//         }
+//     });
+
+//     return sections;
+// };
+
+export const FormScreen = () => {
+    const navigate = useNavigate();
+    const [answers, setAnswers] = useState<Answers>({});
+
+    // Memoize the grouped questions to avoid recalculating on every render
+    // const groupedQuestions = useMemo(() => groupQuestions(questions), []);
+
+    const handleSubmit = () => {
+        navigate('/results', { state: { answers } });
+    };
+
+    const handleBack = () => {
+        navigate('/');
+    };
+
+    const handleAnswerChange = (questionId: string, value: unknown) => {
+        setAnswers(prev => ({ ...prev, [questionId]: value }));
+    };
+
+    function findQuestion(id: string): Question {
+        const question = questions.find(q => q.id === id);
+        if (!question) {
+            throw new Error(`Question with id "${id}" not found.`);
+        }
+        return question;
+    }
+
+    return (
+        <div className="form-screen-container">
+            <div className="form-panel">
+                <section className="form-header">
+                    <button onClick={handleBack} className="back-button">
+                        <span>חזרה</span>
+                        <ChevronRight fontSize='small' />
+                    </button>
+                </section>
+
+                <main className="form-main-content">
+                    {/* Section: שם */}
+                    <div className="form-section">
+                        <FormStep question={findQuestion('name')} value={answers['name']} onChange={(v) => handleAnswerChange('name', v)} />
+                    </div>
+                    <hr className="section-divider" />
+
+                    {/* Section: זהות מגדרית */}
+                    <div className="form-section">
+                        <h3 className="section-title">זהות מגדרית</h3>
+                        <FormStep question={findQuestion('genderIdentity')} value={answers['genderIdentity']} onChange={(v) => handleAnswerChange('genderIdentity', v)} showLabel={false} />
+                    </div>
+                    <hr className="section-divider" />
+
+                    {/* Section: מוצא */}
+                    <div className="form-section">
+                        <h3 className="section-title">מוצא</h3>
+                        <FormStep question={findQuestion('origin_p1_grandpa')} value={answers['origin_p1_grandpa']} onChange={(v) => handleAnswerChange('origin_p1_grandpa', v)} />
+                        <FormStep question={findQuestion('origin_p1_grandma')} value={answers['origin_p1_grandma']} onChange={(v) => handleAnswerChange('origin_p1_grandma', v)} />
+                        <FormStep question={findQuestion('origin_p2_grandpa')} value={answers['origin_p2_grandpa']} onChange={(v) => handleAnswerChange('origin_p2_grandpa', v)} />
+                        <FormStep question={findQuestion('origin_p2_grandma')} value={answers['origin_p2_grandma']} onChange={(v) => handleAnswerChange('origin_p2_grandma', v)} />
+                    </div>
+                    <hr className="section-divider" />
+
+                    {/* Section: שייכות & other single questions */}
+                    {['belonging', 'countryToLive', 'languageToSpeak', 'favoriteCuisine', 'cultureToBelong', 'childhoodEnvironment', 'sexualOrientation', 'religion', 'politicalView', 'diet'].map((id, index, arr) => {
+                        const question = findQuestion(id);
+                        return (
+                            <React.Fragment key={id}>
+                                <div className="form-section">
+                                    <h3 className="section-title">{question.label}</h3>
+                                    <FormStep question={question} value={answers[id]} onChange={(v) => handleAnswerChange(id, v)} showLabel={false} />
+                                </div>
+                                {index < arr.length - 1 && <hr className="section-divider" />}
+                            </React.Fragment>
+                        )
+                    })}
+                </main>
+
+                <div className="form-footer">
+                    <Button onClick={handleSubmit} className="submit-button">
+                        סיימתי!
+                    </Button>
+                </div>
+            </div>
+
+            <div className="flower-panel">
+                <header className="form-header-container">
+                    <Typography className="app-name" dir="ltr">Florigins</Typography>
+                    <hr className="form-border" />
+                </header>
+                <Flower answers={answers} />
+                <div className="form-footer-container">
+                    <hr className="form-border" />
+                </div>
+            </div>
+        </div>
+    );
+};
