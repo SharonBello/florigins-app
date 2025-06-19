@@ -10,48 +10,35 @@ import './FormScreen.scss';
 import type { Question } from '../../types/Question';
 import React from 'react';
 
-// A helper function to group questions into logical sections
-// const groupQuestions = (allQuestions: Question[]) => {
-//     const sections: { title: string; questions: Question[] }[] = [];
-
-//     // Define the sections and the question IDs that belong to them
-//     const sectionMapping = {
-//         'שם': ['name'],
-//         'זהות מגדרית': ['genderIdentity'],
-//         'מוצא': ['origin_p1_grandpa', 'origin_p1_grandma', 'origin_p2_grandpa', 'origin_p2_grandma'],
-//         'שייכות': ['belonging'],
-//         // The rest of the questions will be grouped under their own label
-//     };
-
-//     const addedQuestionIds = new Set<string>();
-
-//     // Create the main defined sections
-//     for (const [title, ids] of Object.entries(sectionMapping)) {
-//         const questionsInSection = ids.map(id => allQuestions.find(q => q.id === id)).filter(Boolean) as Question[];
-//         if (questionsInSection.length > 0) {
-//             sections.push({ title, questions: questionsInSection });
-//             ids.forEach(id => addedQuestionIds.add(id));
-//         }
-//     }
-
-//     // Add remaining questions as their own sections
-//     allQuestions.forEach(q => {
-//         if (!addedQuestionIds.has(q.id)) {
-//             sections.push({ title: q.label, questions: [q] });
-//         }
-//     });
-
-//     return sections;
-// };
-
 export const FormScreen: React.FC = (): JSX.Element => {
     const navigate = useNavigate();
     const [answers, setAnswers] = useState<Answers>({});
 
-    // Memoize the grouped questions to avoid recalculating on every render
-    // const groupedQuestions = useMemo(() => groupQuestions(questions), []);
+    const allQuestionsAnswered = React.useMemo(() => {
+        return questions.every(question => {
+            const answer = answers[question.id];
+
+            if (typeof answer === 'number') {
+                return true;
+            }
+
+            if (typeof answer === 'string' && answer.trim() !== '') {
+                return true;
+            }
+
+            if (answer) {
+                return true;
+            }
+
+            return false;
+        });
+    }, [answers]);
 
     const handleSubmit = () => {
+        if (!allQuestionsAnswered) {
+            console.error("Submit called on an invalid form.");
+            return;
+        }
         navigate('/results', { state: { answers } });
     };
 
@@ -196,7 +183,11 @@ export const FormScreen: React.FC = (): JSX.Element => {
                 </main>
 
                 <div className="form-footer">
-                    <Button onClick={handleSubmit} className="submit-button">
+                    <Typography variant="caption" className={`validation-message ${allQuestionsAnswered ? 'is-hidden' : ''}`}>
+                        יש למלא את כל השדות כדי להמשיך
+                    </Typography>
+
+                    <Button onClick={handleSubmit} className="submit-button" disabled={!allQuestionsAnswered}>
                         סיימתי!
                     </Button>
                 </div>

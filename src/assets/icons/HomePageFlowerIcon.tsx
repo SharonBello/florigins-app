@@ -1,4 +1,4 @@
-export const HomePageFlower = () => (
+export const HomePageFlowerIcon = () => (
     <svg width="371" height="305" viewBox="0 0 371 305" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g filter="url(#filter0_d_7_142)">
             <path d="M218.911 50.0456C218.911 65.3446 206.499 117.393 191.188 117.393C175.878 117.393 163.466 65.3446 163.466 50.0456C163.466 45.0329 171.08 46.6127 173.41 42.5563C178.192 34.2323 180.894 22.3442 191.188 22.3442C201.483 22.3442 203.994 34.4225 208.776 42.7465C211.107 46.8029 218.911 45.0329 218.911 50.0456Z" fill="url(#paint0_linear_7_142)" />
@@ -508,5 +508,4 @@ export const HomePageFlower = () => (
             </linearGradient>
         </defs>
     </svg>
-
 );

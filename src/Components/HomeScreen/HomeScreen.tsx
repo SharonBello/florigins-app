@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { HomePageFlower } from "../../assets/icons/HomePageFlower.tsx";
 import { Button, Typography } from '@mui/material';
 import './HomeScreen.scss';
+import { HomePageFlowerIcon } from '../../assets/icons/HomePageFlowerIcon';
 
 
 export const HomeScreen = () => {
@@ -20,7 +20,7 @@ export const HomeScreen = () => {
 
             <main className="main-content">
                 <div className="flower-container">
-                    <HomePageFlower />
+                    <HomePageFlowerIcon />
                 </div>
                 <div className="btn-container">
                     <Button onClick={handleStart} className="homepage-button">צור פרח חדש</Button>
