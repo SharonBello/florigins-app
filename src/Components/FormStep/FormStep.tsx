@@ -1,5 +1,6 @@
-import { flowerDefinitions } from "../data/appData";
-import type { Question } from "../types/Question";
+import { flowerDefinitions } from "../../data/appData";
+import type { Question } from "../../types/Question";
+import "../FormScreen/FormScreen.scss";
 
 interface FormStepProps {
     question: Question;
@@ -29,7 +30,7 @@ export const FormStep = ({ question, value, onChange, showLabel = true }: FormSt
             case 'language_select':
                 return (
                     <select className="input-underline" value={stringValue} onChange={(e) => onChange(e.target.value)}>
-                        <option value="" disabled>בחירת מדינה</option>
+                        <option value="" disabled>...</option>
                         {flowerDefinitions.sort((a, b) => a.countryHebrew.localeCompare(b.countryHebrew)).map(def => (
                             <option key={def.country} value={def.country}>{def.countryHebrew}</option>
                         ))}
@@ -38,9 +39,31 @@ export const FormStep = ({ question, value, onChange, showLabel = true }: FormSt
             case 'range':
                 return (
                     <div className="range-container">
-                        <span>{question.options?.[0]}</span>
-                        <input type="range" min="-1" max="1" step="1" value={typeof value === 'number' ? value : Number(value) || 0} onChange={(e) => onChange(Number(e.target.value))} />
-                        <span>{question.options?.[2]}</span>
+                        {/* left label */}
+                        <span className="range-end range-end--min">
+                            {question.options?.[2]}
+                        </span>
+
+                        {/* the actual slider */}
+                        <input
+                            className="range-input"
+                            type="range"
+                            min={-1}
+                            max={1}
+                            step={1}
+                            value={typeof value === 'number' ? value : Number(value) || 0}
+                            onChange={e => onChange(Number(e.target.value))}
+                        />
+
+                        {/* right label */}
+                        <span className="range-end range-end--max">
+                            {question.options?.[0]}
+                        </span>
+
+                        {/* center text under the diamond */}
+                        <div className="range-center-label">
+                            {question.options?.[1]}
+                        </div>
                     </div>
                 );
             default:
