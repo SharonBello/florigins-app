@@ -1,0 +1,78 @@
+.result-screen-container {
+    direction: rtl;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: #f8f5f2; /* A light background color like the image */
+    padding: 2rem;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.result-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    position: absolute;
+    top: 1.5rem;
+    left: 0;
+}
+
+.result-title {
+    font-family: "Heebo", sans-serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+}
+
+.flower-display-container {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin: 1rem 0;
+}
+
+.result-description {
+    font-family: "Heebo", sans-serif;
+    font-size: 1.1rem;
+    font-weight: 300;
+    max-width: 450px;
+    margin: 1.5rem 0;
+    color: #555;
+}
+
+.result-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 2rem;
+}
+
+.result-button {
+    font-family: "Heebo", sans-serif;
+    border: 1px solid #ccc !important;
+    color: #555 !important;
+    border-radius: 20px !important;
+    padding: 0.5rem 1.5rem !important;
+    transition: all 0.3s !important;
+}
+
+.result-button:hover {
+    background-color: #f0f0f0 !important;
+    border-color: #aaa !important;
+}

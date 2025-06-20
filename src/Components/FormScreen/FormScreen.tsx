@@ -53,16 +53,21 @@ export const FormScreen: React.FC = (): JSX.Element => {
         });
     }, [answers]);
 
-    const handleSubmit = () => {
+    const handlePrint = () => {
         if (!allQuestionsAnswered) {
             console.error("Submit called on an invalid form.");
             return;
         }
+        window.print();
         navigate('/results', { state: { answers } });
     };
 
     const handleBack = () => {
         navigate('/');
+    };
+
+    const handleReset = () => {
+        setAnswers({});
     };
 
     const handleAnswerChange = (questionId: string, value: unknown) => {
@@ -81,6 +86,28 @@ export const FormScreen: React.FC = (): JSX.Element => {
 
     return (
         <div className="form-screen-container">
+            <style>
+                {`
+                    @media print {
+                        body * {
+                            visibility: hidden;
+                        }
+                        .flower-panel, .flower-panel * {
+                            visibility: visible;
+                        }
+                        .flower-panel {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                    }
+                `}
+            </style>
             <div className="form-panel">
                 <section className="form-header">
                     <button onClick={handleBack} className="back-button">
@@ -202,13 +229,18 @@ export const FormScreen: React.FC = (): JSX.Element => {
                 </main>
 
                 <div className="form-footer">
-                    <Typography variant="caption" className={`validation-message ${allQuestionsAnswered ? 'is-hidden' : ''}`}>
-                        יש למלא את כל השדות כדי להמשיך
-                    </Typography>
-
-                    <Button onClick={handleSubmit} className="submit-button" disabled={!allQuestionsAnswered}>
-                        סיימתי!
+                    <Button onClick={handleReset} className="reset-form-button">
+                        התחל מחדש
                     </Button>
+                    <div className='print-container'>
+                        <Typography variant="caption" className={`validation-message ${allQuestionsAnswered ? 'is-hidden' : ''}`}>
+                            יש למלא את כל השדות כדי להמשיך
+                        </Typography>
+
+                        <Button onClick={handlePrint} className="print-button" disabled={!allQuestionsAnswered}>
+                            הדפס
+                        </Button>
+                    </div>
                 </div>
             </div>
 

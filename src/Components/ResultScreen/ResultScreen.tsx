@@ -1,33 +1,78 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { Flower } from '../Flower/Flower';
+import { useRef } from 'react';
+import ShareIcon from '@mui/icons-material/Share'; 
+import './ResultScreen.scss'
 
 export const ResultScreen = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const answers = location.state?.answers || {};
+    const flowerRef = useRef<HTMLDivElement>(null);
 
-    const handleReset = () => {
+    const handleStartOver = () => {
         navigate('/form');
     };
 
+    const handleGallery = () => {
+        navigate('/gallery');
+    };
+
+    const handleShare = async () => {
+        const shareData = {
+            title: `הפרח של ${answers['name'] || 'אלמוני'}`,
+            text: 'ראו את פרח המקורות שיצרתי ב-Florigins! בואו ליצור גם את שלכם.',
+            url: window.location.href, // This will share the URL of the results page
+        };
+        
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+                console.log('Content shared successfully');
+            } catch (err) {
+                console.error('Error sharing:', err);
+            }
+        } else {
+            // Fallback for desktop or browsers that don't support the Web Share API
+            navigator.clipboard.writeText(shareData.url).then(() => {
+                alert('הקישור לפרח הועתק! אפשר לשתף אותו עם חברים.');
+            }, (err) => {
+                console.error('Could not copy text: ', err);
+                alert('לא ניתן להעתיק את הקישור.');
+            });
+        }
+    };
+    
+
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center text-center animate-fade-in p-8" dir="rtl">
-            <h1 className="text-4xl font-light mb-2">הפרח של {answers['name'] || 'אלמוני'}</h1>
-            <div className="my-8 w-80 h-80">
-                <Flower answers={answers} />
+        <>
+            <div className="result-screen-container">
+                <header className="result-header">
+                    <span className="result-title">{answers['name'] || 'הפרח שלך'}</span>
+                    <span className="result-title" style={{ direction: 'ltr' }}>Florigins</span>
+                </header>
+                
+                <div ref={flowerRef} className="flower-display-container">
+                    <Flower answers={answers} />
+                </div>
+                
+                <p className="result-description">
+                    ...טקסט תיאור הפרח יוצג כאן
+                </p>
+
+                <div className="result-actions">
+                    <Button onClick={handleShare} className="result-button" variant="outlined" startIcon={<ShareIcon />}>
+                        שתף
+                    </Button>
+                    <Button onClick={handleStartOver} className="result-button" variant="outlined">
+                        צור פרח חדש
+                    </Button>
+                     <Button onClick={handleGallery} className="result-button" variant="outlined">
+                        מאגר הפרחים
+                    </Button>
+                </div>
             </div>
-            <p className="max-w-md mx-auto text-lg mb-8">
-                ...טקסט תיאור הפרח יוצג כאן
-            </p>
-            <div className="flex gap-4">
-                <Button onClick={handleReset} className="homepage-button" variant="outlined">
-                    צור פרח חדש
-                </Button>
-                <Button className="homepage-button" variant="contained" color="primary">
-                    שתף
-                </Button>
-            </div>
-        </div>
+        </>
     );
 };

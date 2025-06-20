@@ -27,7 +27,8 @@
       padding-bottom: 0.5rem; // Adds some space above the line
       margin-bottom: 1rem;
 
-      .app-name, .creator-name {
+      .app-name,
+      .creator-name {
         font-size: 1rem;
         text-align: left;
         letter-spacing: 0.2em;
@@ -150,46 +151,72 @@
     padding-top: 0.5rem;
     margin-bottom: 2rem;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 2.75rem;
+    // padding-inline: 2rem;
 
-    .validation-message {
-      color: #888;
-      font-family: $main-font;
-      height: 1.2rem;
-      transition: opacity 0.3s ease-out;
-      opacity: 1;
-
-      &.is-hidden {
-        opacity: 0;
-      }
-    }
-
-    .submit-button {
+    .reset-form-button {
       background-color: $text-color;
       color: white;
       border-radius: 9999px !important;
       padding: 0.75rem 2.5rem !important;
       font-family: $main-font !important;
-      width: 50%;
+      width: 12rem;
       transition:
-        background-color 0.3s,
-        opacity 0.3s;
+      background-color 0.3s,
+      opacity 0.3s;
       cursor: pointer;
-
-      &:disabled {
-        // background-color: darken($button-background-color, 10%);
-        background: color.scale($button-background-color, $lightness: -10%);
-
-        opacity: 0.7;
-        cursor: not-allowed;
-      }
-
+      // flex: 0.4;
+      
       &:hover {
         // background-color: darken($button-background-color, 80%);
         background: color.scale($button-background-color, $lightness: -80%);
+      }
+    }
+    .print-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      
+      .validation-message {
+        color: #888;
+        font-family: $main-font;
+        height: 1.2rem;
+        transition: opacity 0.3s ease-out;
+        opacity: 1;
+        
+        &.is-hidden {
+          opacity: 0;
+        }
+      }
+      
+      .print-button {
+        background-color: $text-color;
+        color: white;
+        border-radius: 9999px !important;
+        padding: 0.75rem 2.5rem !important;
+        font-family: $main-font !important;
+        transition:
+        background-color 0.3s,
+        opacity 0.3s;
+        cursor: pointer;
+        width: 12rem;
+
+        &:disabled {
+          // background-color: darken($button-background-color, 10%);
+          background: color.scale($button-background-color, $lightness: -10%);
+
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        &:hover {
+          // background-color: darken($button-background-color, 80%);
+          background: color.scale($button-background-color, $lightness: -80%);
+        }
       }
     }
   }
