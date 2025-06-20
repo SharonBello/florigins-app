@@ -1,4 +1,4 @@
-@use 'sass:color';
+@use "sass:color";
 @import "../../styles/variables.scss";
 
 .form-screen-container {
@@ -20,8 +20,14 @@
     .form-header-container {
       width: 100%;
       padding-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between; // Pushes children to opposite ends
+      align-items: center; // Aligns them vertically
+      border-bottom: 1px solid #e0e0e0; // Replaces the old <hr /> tag
+      padding-bottom: 0.5rem; // Adds some space above the line
+      margin-bottom: 1rem;
 
-      .app-name {
+      .app-name, .creator-name {
         font-size: 1rem;
         text-align: left;
         letter-spacing: 0.2em;
@@ -176,11 +182,11 @@
       &:disabled {
         // background-color: darken($button-background-color, 10%);
         background: color.scale($button-background-color, $lightness: -10%);
-        
+
         opacity: 0.7;
         cursor: not-allowed;
       }
-      
+
       &:hover {
         // background-color: darken($button-background-color, 80%);
         background: color.scale($button-background-color, $lightness: -80%);

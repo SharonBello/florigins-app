@@ -214,8 +214,11 @@ export const FormScreen: React.FC = (): JSX.Element => {
 
             <div className="flower-panel">
                 <header className="form-header-container">
+                    <Typography className="creator-name">
+                        {answers.name as string}
+                    </Typography>
                     <Typography className="app-name" dir="ltr">Florigins</Typography>
-                    <hr className="form-border" />
+                    {/* <hr className="form-border" /> */}
                 </header>
                 <Flower answers={answers} />
                 <div className="form-footer-container">

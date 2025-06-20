@@ -378,34 +378,87 @@ export const sexualOrientationAccents: Record<string, (props: { fill: string }) 
 };
 
 // Accents between petals, based on Religion
-export const religionAccents: Record<string, React.ReactElement> = {
-  'יהודי': React.createElement('circle', { r: 1 }),
-  'נוצרי': React.createElement('path', { d: "M-1.5,0 L1.5,0 M0,-1.5 L0,1.5" }),
-  'מוסלמי': React.createElement('path', { d: "M-1,2 A2.5 2.5 0 1 0 1.5 -1.5" }), // Crescent
-  'בודהיסט': React.createElement('circle', { r: 1, strokeWidth: 0.5, stroke: "#333", fill: "none" }), // Open circle
-  'אתאיסט': React.createElement(React.Fragment, null), // No accent
+export const religionAccents: Record<string, (props: { fill: string }) => JSX.Element> = {
+  'יהודי': ({ fill }) => ( // Jewish - Star of David from your SVG
+    <g transform="translate(5.9, -66) rotate(90)">
+      <path d="M4.75887 1.31262C5.42913 0.151706 7.10476 0.151709 7.77502 1.31263L11.322 7.45611C12.1454 8.88227 10.7041 10.5673 9.15209 10.0166C7.80424 9.53839 6.60311 9.14882 6.26686 9.14882C5.93062 9.14882 4.72961 9.53836 3.38186 10.0166C1.82986 10.5673 0.388564 8.88222 1.21196 7.45605L4.75887 1.31262Z" fill={fill} strokeWidth={0} />
+      <path d="M7.77458 10.8879C7.10432 12.0489 5.42868 12.0489 4.75843 10.8879L1.21148 4.74445C0.388088 3.31829 1.82937 1.63326 3.38136 2.18393C4.72921 2.66217 5.93034 3.05174 6.26659 3.05174C6.60282 3.05174 7.80384 2.66221 9.15159 2.18399C10.7036 1.63331 12.1449 3.31834 11.3215 4.74452L7.77458 10.8879Z" fill={fill} strokeWidth={0} />
+    </g>
+  ),
+  'נוצרי': ({ fill }) => ( // Christian - Centered cross
+    <g transform="translate(6.5, -66) rotate(90)">
+      <rect x="4.59766" y="0.802124" width="4.06321" height="12.1896" rx="2.03161" fill={fill} strokeWidth={0} />
+      <rect x="12.7231" y="4.86646" width="4.06321" height="12.1896" rx="2.03161" transform="rotate(90 12.7231 4.86646)" fill={fill} strokeWidth={0} />
+    </g>
+  ),
+  'מוסלמי': ({ fill }) => ( // Muslim - Centered crescent
+    <g transform="translate(-8, -55) rotate(270)">
+      <path d="M9.26951 8.22883C9.26951 12.244 6.01458 15.4989 1.99942 15.4989C-2.01574 15.4989 2.56581 12.244 2.56581 8.22883C2.56581 4.21367 -2.01574 0.95874 1.99942 0.95874C6.01458 0.95874 9.26951 4.21367 9.26951 8.22883Z" fill={fill} strokeWidth={0} />
+    </g>
+  ),
+  'בודהיסט': ({ fill }) => ( // Buddhist - Open circle
+    <g transform="translate(-5, -55) rotate(270)">
+      <path d="M9.64233 4.24874C10.8032 4.91899 10.8032 6.59463 9.64233 7.26489L3.49885 10.8118C2.07268 11.6352 0.387655 10.1939 0.938328 8.64195C1.41657 7.2941 1.80613 6.09298 1.80613 5.75673C1.80613 5.42049 1.4166 4.21947 0.938388 2.87173C0.387704 1.31973 2.07274 -0.121568 3.49891 0.701832L9.64233 4.24874Z" fill={fill} strokeWidth={0} />
+    </g>
+  ),
+  'אתאיסט': ({ fill }) => ( // Atheist - No accent
+    <g transform="translate(-5, -55) rotate(270)">
+      <circle cx="4.87346" cy="5.05412" r="4.35344" fill={fill} strokeWidth={0} />
+    </g>
+  ),
 };
 
 // Side accents on horizontal petals, based on Political View
-export const politicalViewAccents: Record<string, { left: number, right: number }> = {
-  'שמאל': { left: 2, right: 0 },
-  'שמאל מרכז': { left: 2, right: 1 },
-  'מרכז': { left: 1, right: 1 },
-  'ימין מרכז': { left: 1, right: 2 },
-  'ימין': { left: 0, right: 2 },
+const FullAccentShape = ({ fill }: { fill: string }) => (
+  <g transform="translate(-69, 115) rotate(90)">
+    <path d="M17.5183 23.3099L11.094 23.3099C5.0117 23.3099 0.0810074 18.3792 0.0810079 12.2968L6.50529 12.2968C12.5876 12.2968 17.5183 17.2275 17.5183 23.3099Z" fill={fill} strokeWidth={0} />
+    <path d="M17.5183 0.672607L11.094 0.672607C5.0117 0.672607 0.0810069 5.60331 0.0810067 11.6856L6.50528 11.6856C12.5876 11.6856 17.5183 6.75494 17.5183 0.672607Z" fill={fill} strokeWidth={0} />
+  </g>
+);
+
+const HalfAccentShape = ({ fill }: { fill: string }) => (
+  <g transform="translate(-78, 115) rotate(90)">
+    <path d="M0.669922 0.666931L7.0942 0.666932C13.1765 0.666933 18.1072 5.59764 18.1072 11.68L11.6829 11.68C5.60062 11.68 0.669921 6.74926 0.669922 0.666931Z" fill={fill} strokeWidth={0} />
+  </g>
+);
+
+// --- NEW DATA STRUCTURE FOR POLITICAL ACCENTS ---
+export const politicalViewAccents: Record<string, {
+  left: ((props: { fill: string }) => JSX.Element) | null;
+  right: ((props: { fill: string }) => JSX.Element) | null;
+  leftTilt?: number;
+  rightTilt?: number;
+}> = {
+  'שמאל': { right: FullAccentShape, left: null, leftTilt: 0 },
+  'שמאל מרכז': { right: FullAccentShape, left: HalfAccentShape, leftTilt: 0, rightTilt: 0 },
+  'מרכז': { left: FullAccentShape, right: FullAccentShape, leftTilt: 0, rightTilt: 0 },
+  'ימין מרכז': { right: HalfAccentShape, left: FullAccentShape, leftTilt: 0, rightTilt: 0 },
+  'ימין': { right: null, left: FullAccentShape, rightTilt: 0 },
 };
 
 // Accents between petals, based on Diet
-export const dietAccents: Record<string, React.ReactElement> = {
-  'אוכל הכל': React.createElement('path', { d: "M0,-2 L2,0 L0,2 L-2,0 Z" }), // Diamond
-  'טבעוני': React.createElement('path', { d: "M0,-2 L2,1.5 L-2,1.5 Z" }), // Triangle
-  'צמחוני': React.createElement('circle', { r: "1.5" }), // Circle
-  'אוכל כשרות': React.createElement(
-    'g',
-    null,
-    React.createElement('path', { d: "M-1,-1 L0,-2 L1,-1 L0,0 Z" }),
-    React.createElement('path', { d: "M-1,1 L0,2 L1,1 L0,0 Z" })
-  ), // Two small diamonds
+export const dietAccents: Record<string, (props: { fill: string }) => JSX.Element> = {
+  'אוכל הכל': ({ fill }) => ( // Eats Everything - Centered 4-point star
+    <g transform="translate(-9, -110) scale(0.7)">
+      <path d="M22.0859 10.5008C17.3154 12.4652 13.477 16.2294 11.4141 20.9481C9.35126 16.2295 5.51251 12.4654 0.742187 10.5008C5.51264 8.53605 9.35142 4.77238 11.4141 0.0535273C13.4769 4.77249 17.3152 8.53621 22.0859 10.5008Z" fill={fill} strokeWidth={0} />
+    </g>
+  ),
+  'טבעוני': ({ fill }) => ( // Vegan - Centered oval and circle
+    <g transform="translate(3, -115) scale(0.5) rotate(90)">
+      <path d="M8.99843 0.529452C13.4528 0.529452 28.7951 4.03784 28.7951 8.36565C28.7951 12.6935 13.4528 16.2018 8.99843 16.2018C4.54407 16.2018 0.933106 12.6935 0.933106 8.36565C0.933106 4.03784 4.54407 0.529452 8.99843 0.529452Z" fill={fill} strokeWidth={0} />
+      <circle cx="38.3693" cy="8.36568" r="4.35344" fill={fill} strokeWidth={0} />
+    </g>
+  ),
+  'צמחוני': ({ fill }) => ( // Vegetarian - Centered oval
+    <g transform="translate(-6, -95) scale(0.6) rotate(270)">
+      <path d="M20.7147 16.2017C16.2604 16.2017 0.918004 12.6934 0.918005 8.36555C0.918005 4.03774 16.2604 0.529357 20.7147 0.529358C25.1691 0.529358 28.78 4.03774 28.78 8.36555C28.78 12.6934 25.1691 16.2017 20.7147 16.2017Z" fill={fill} strokeWidth={0} />
+    </g>
+  ),
+  'אוכל כשרות': ({ fill }) => ( // Eats Kosher - Centered leaf/fish shape
+    <g transform="translate(-9, -95) scale(0.6) rotate(270)">
+      <path d="M0.923952 14.1392C0.343493 13.8041 0.343494 12.9663 0.923953 12.6312L21.4338 0.789789C22.86 -0.0336053 24.5419 1.40255 23.9625 2.94407C22.4481 6.97366 20.5144 12.3259 20.5144 13.3854C20.5144 14.4448 22.448 19.7968 23.9625 23.8263C24.5418 25.3678 22.8599 26.804 21.4337 25.9806L0.923952 14.1392Z" fill={fill} strokeWidth={0} />
+    </g>
+  ),
 };
 
 // Dots inside inner petals, based on Childhood Environment

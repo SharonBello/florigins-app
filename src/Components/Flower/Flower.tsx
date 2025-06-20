@@ -64,13 +64,16 @@ export const Flower = ({ answers }: { answers: Answers }) => {
   const CenterShapeComponent = centerShapes[answers.genderIdentity as string] || null;
   // ... (the rest of your accent logic remains the same)
   const OrientationAccentComponent = sexualOrientationAccents[answers.sexualOrientation as string] || null;
-  const religionAccentElement = religionAccents[answers.religion as string] || null;
-  const politicalAccents = politicalViewAccents[answers.politicalView as string] || null;
-  const dietAccentElement = dietAccents[answers.diet as string] || null;
+  const ReligionAccentElement = religionAccents[answers.religion as string] || null;
+  const DietAccentComponent = dietAccents[answers.diet as string] || null;
   const childhoodAccentElement = childhoodEnvironmentAccents[answers.childhoodEnvironment as string] || null;
 
   const innerPetals = allPetals.filter(p => !basePetalKeys.has(p.key));
   const topAndBottomInnerPetals = innerPetals.filter(p => p.rotation === 0 || p.rotation === 180);
+  const leftAndRightInnerPetals = innerPetals.filter(p => p.rotation === 90 || p.rotation === 270);
+  const PoliticalAccents = politicalViewAccents[answers.politicalView as string] || null;
+  const rightPetal = innerPetals.find(p => p.rotation === 270);
+  const leftPetal = innerPetals.find(p => p.rotation === 90);
 
   return (
     <div className="flower-container">
@@ -127,38 +130,40 @@ export const Flower = ({ answers }: { answers: Answers }) => {
             ))}
 
             {/* Political View Accents - On sides of horizontal outer petals */}
-            {politicalAccents && Array(politicalAccents.right).fill(0).map((_, i) => (
-              <g key={`pv-r-${i}`} transform={`rotate(90 50 50) translate(${i * 2}, -30)`} className="accent-enter">
-                <path d="M-1,1 L0,0 L-1,-1" transform="scale(0.8)" />
+            {PoliticalAccents && PoliticalAccents.right && rightPetal && (
+              <g transform={`translate(100, 100) rotate(90) translate(65, 0) rotate(${PoliticalAccents.rightTilt || 0})`}>
+                <g transform="scale(0.8)">
+                  <PoliticalAccents.right fill={`url(#${rightPetal.gradientId})`} />
+                </g>
               </g>
-            ))}
-            {politicalAccents && Array(politicalAccents.left).fill(0).map((_, i) => (
-              <g key={`pv-l-${i}`} transform={`rotate(270 50 50) translate(${i * -2}, -30)`} className="accent-enter">
-                <path d="M1,1 L0,0 L1,-1" transform="scale(0.8)" />
+            )}
+            {PoliticalAccents && PoliticalAccents.left && leftPetal && (
+              <g transform={`translate(100, 100) rotate(270) translate(65, 0) rotate(${PoliticalAccents.leftTilt || 0})`}>
+                <g transform="scale(0.8)">
+                  <PoliticalAccents.left fill={`url(#${leftPetal.gradientId})`} />
+                </g>
               </g>
-            ))}
+            )}
 
-            {/* Diet Accents - Between inner petals */}
-            {dietAccentElement && [45, 135, 225, 315].map(r => (
-              <g key={`d-${r}`} transform={`rotate(${r} 50 50) translate(0, -22)`} className="accent-enter">
-                {dietAccentElement}
+            {DietAccentComponent && leftAndRightInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
+              <g key={`r-${petal.key}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(0, -35)`}>
+                <g transform="scale(0.8)">
+                  <DietAccentComponent fill={`url(#${petal.gradientId})`} />
+                </g>
               </g>
             ))}
 
             {/* Religion Accents - Between inner and outer petals */}
-            {religionAccentElement && [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5].map(r => (
-              <g key={`r-${r}`} transform={`rotate(${r} 50 50) translate(0, -26)`} className="accent-enter">
-                {religionAccentElement}
+            {ReligionAccentElement && leftAndRightInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
+              <g key={`r-${petal.key}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(0, -35)`}>
+                <g transform="scale(0.8)">
+                  <ReligionAccentElement fill={`url(#${petal.gradientId})`} />
+                </g>
               </g>
             ))}
 
             {/* Childhood Accents - Inside inner petals */}
             {childhoodAccentElement && innerPetals.map(p => {
-              // This new transform correctly positions the accents on the inner petals
-              // 1. translate(100, 100) -> Go to flower center
-              // 2. rotate(p.rotation) -> Rotate to match the petal's angle
-              // 3. translate(0, -70)  -> Move outwards onto the petal
-              // 4. rotate(-p.rotation) -> "Un-rotate" the accent so it points straight
               return (
                 <g key={`c-${p.key}`} transform={`translate(100, 100) rotate(${p.rotation}) translate(0, -65)`}>
                   <g transform="scale(0.5)">
