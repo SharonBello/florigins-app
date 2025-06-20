@@ -1,4 +1,4 @@
-@import '../../styles/variables.scss';
+@use '../../styles/variables' as *;
 
 .homepage-container {
     width: 100%;
@@ -29,22 +29,19 @@
         text-align: center;
     }
 
-    .footer-container {
-        width: 100%;
-        padding-top: 0.5rem;
-    }
-
-    .flower-container {
+    
+    .homepage-flower-container {
         margin: 2rem 0;
     }
-
+    
     .btn-container {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 1.25rem;
+        padding-top: 2rem;
     }
-
+    
     .homepage-button {
         background-color: $button-background-color !important;
         color: $text-color !important;
@@ -57,18 +54,23 @@
         letter-spacing: 0.1em !important;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
         transition: all 0.2s ease-in-out;
-
+        
         &:hover {
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
             transform: translateY(-2px);
         }
     }
-
-    .border {
-        border: 0;
-        border-top: 1px solid $border-color;
-        opacity: 0.3;
+    .footer-container {
         width: 100%;
+        padding-top: 0.5rem;
+        height: 3vh;
+        
+        .border {
+            border: 0;
+            border-top: 1px solid $border-color;
+            opacity: 0.3;
+            width: 100%;
+        }
     }
 
 }

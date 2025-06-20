@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
-import { Flower } from '../Flower';
+import { Flower } from '../Flower/Flower';
 
 export const ResultScreen = () => {
     const navigate = useNavigate();

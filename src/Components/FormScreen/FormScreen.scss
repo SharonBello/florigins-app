@@ -1,17 +1,21 @@
+@use 'sass:color';
 @import "../../styles/variables.scss";
 
 .form-screen-container {
   display: grid;
   grid-template-columns: 1fr 80%;
   grid-template-rows: 1fr;
-  height: 100vh;
+  // height: 100vh;
   grid-template-areas: "form-panel flower-panel";
   max-height: 90vh;
+  width: 97%;
   direction: rtl;
 
   .flower-panel {
     grid-area: flower-panel;
     padding: 2rem;
+    display: flex;
+    flex-direction: column;
 
     .form-header-container {
       width: 100%;
@@ -23,6 +27,14 @@
         letter-spacing: 0.2em;
         font-family: $main-font;
         font-weight: $font-weight-light;
+      }
+    }
+
+    .flower-container {
+      flex: 1;
+      max-height: 85vh;
+
+      svg {
       }
     }
 
@@ -162,13 +174,16 @@
       cursor: pointer;
 
       &:disabled {
-        background-color: darken($button-background-color, 10%);
+        // background-color: darken($button-background-color, 10%);
+        background: color.scale($button-background-color, $lightness: -10%);
+        
         opacity: 0.7;
         cursor: not-allowed;
       }
-
+      
       &:hover {
-        background-color: darken($button-background-color, 80%);
+        // background-color: darken($button-background-color, 80%);
+        background: color.scale($button-background-color, $lightness: -80%);
       }
     }
   }
@@ -251,7 +266,8 @@
         font-weight: $font-weight-light;
 
         &:hover {
-          background-color: darken($button-background-color, 3%);
+          // background-color: darken($button-background-color, 3%);
+          background: color.scale($button-background-color, $lightness: -3%);
         }
 
         &.active {
@@ -326,6 +342,7 @@
     .range-container {
       position: relative;
       padding: 1rem;
+      max-width: 18vw;
 
       .range-input {
         -webkit-appearance: none;

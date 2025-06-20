@@ -1,0 +1,36 @@
+.flower-container {
+    width: 80%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes growIn {
+    from {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.petal-enter, .accent-enter {
+  animation: fadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.center-enter {
+    // transform-origin: 50% 50%;
+    animation: growIn 0.5s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}

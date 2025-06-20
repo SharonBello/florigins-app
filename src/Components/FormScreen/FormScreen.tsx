@@ -2,13 +2,32 @@ import { useState, type JSX } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { questions } from "../../data/appData";
 import type { Answers } from "../../types/Answers";
-import { Flower } from "../Flower";
+import { Flower } from "../Flower/Flower";
 import { FormStep } from "../FormStep/FormStep";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button, IconButton, Typography } from '@mui/material';
 import './FormScreen.scss';
 import type { Question } from '../../types/Question';
 import React from 'react';
+
+// const debugAnswers: Answers = {
+//     name: "Test Flower",
+//     genderIdentity: "אשה",
+//     origin_p1_grandpa: "Israel",
+//     origin_p1_grandma: "Egypt",
+//     origin_p2_grandpa: "South Africa",
+//     origin_p2_grandma: "Morocco",
+//     belonging: 0,
+//     countryToLive: "Japan",
+//     languageToSpeak: "Italy",
+//     favoriteCuisine: "Thailand",
+//     cultureToBelong: "Brazil",
+//     childhoodEnvironment: "עיר",
+//     sexualOrientation: "הטרוסקסואל",
+//     religion: "יהודי",
+//     politicalView: "מרכז",
+//     diet: "אוכל הכל",
+// };
 
 export const FormScreen: React.FC = (): JSX.Element => {
     const navigate = useNavigate();

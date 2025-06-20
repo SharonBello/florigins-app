@@ -19,7 +19,7 @@ export const HomeScreen = () => {
             </header>
 
             <main className="main-content">
-                <div className="flower-container">
+                <div className="homepage-flower-container">
                     <HomePageFlowerIcon />
                 </div>
                 <div className="btn-container">
