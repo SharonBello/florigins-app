@@ -19,32 +19,77 @@ export const ResultScreen = () => {
         navigate('/gallery');
     };
 
-    const handleShare = async () => {
-        const shareData = {
-            title: `הפרח של ${answers['name'] || 'אלמוני'}`,
-            text: 'ראו את פרח המקורות שיצרתי ב-Florigins! בואו ליצור גם את שלכם.',
-            url: window.location.href, // This will share the URL of the results page
-        };
+    const handleShare = async (): Promise<void> => {
+        const container = flowerRef.current
+        if (!container) return
+        const svgEl = container.querySelector('svg') as SVGSVGElement | null
+        if (!svgEl) return
 
-        if (navigator.share) {
-            try {
-                await navigator.share(shareData);
-                console.log('Content shared successfully');
-            } catch (err) {
-                console.error('Error sharing:', err);
-            }
-        } else {
-            // Fallback for desktop or browsers that don't support the Web Share API
-            navigator.clipboard.writeText(shareData.url).then(() => {
-                alert('הקישור לפרח הועתק! אפשר לשתף אותו עם חברים.');
-            }, (err) => {
-                console.error('Could not copy text: ', err);
-                alert('לא ניתן להעתיק את הקישור.');
-            });
+        // Serialize SVG → string
+        const serializer = new XMLSerializer()
+        const svgString = serializer.serializeToString(svgEl)
+
+        // Make a Blob+URL for <img>
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
+        const url = URL.createObjectURL(svgBlob)
+        const img = new Image()
+
+        img.onload = async (): Promise<void> => {
+            // 1) get rendered size
+            const rect = svgEl.getBoundingClientRect()
+            const width = rect.width
+            const height = rect.height
+
+            // 2) choose scale factor (for Retina, etc.)
+            const scale = window.devicePixelRatio || 1
+
+            // 3) setup a higher-res canvas
+            const canvas = document.createElement('canvas')
+            canvas.width = width * scale
+            canvas.height = height * scale
+            // keep CSS size correct
+            canvas.style.width = `${width}px`
+            canvas.style.height = `${height}px`
+
+            const ctx = canvas.getContext('2d')
+            if (!ctx) return
+
+            // 4) scale the drawing context
+            ctx.scale(scale, scale)
+            ctx.drawImage(img, 0, 0, width, height)
+
+            // 5) export to PNG
+            canvas.toBlob(async (blob) => {
+                if (!blob) return
+                const file = new File([blob], 'flower.png', { type: 'image/png' })
+
+                if (navigator.canShare?.({ files: [file] })) {
+                    try {
+                        await navigator.share({
+                            files: [file],
+                            title: `הפרח של ${answers.name || 'אלמוני'}`,
+                            text: 'ראו את הפרח שיצרתי ב-Florigins!',
+                        })
+                    } catch (err) {
+                        console.error('Share failed:', err)
+                    }
+                } else {
+                    // fallback: download
+                    const dlUrl = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = dlUrl
+                    a.download = 'flower.png'
+                    a.click()
+                    URL.revokeObjectURL(dlUrl)
+                }
+
+                // cleanup
+                URL.revokeObjectURL(url)
+            }, 'image/png')
         }
-    };
 
-
+        img.src = url
+    }
     return (
         <>
             <div className="result-screen-container">
