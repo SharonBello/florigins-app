@@ -44,10 +44,10 @@ const getTooltipConfig = (rotation: number): { placement: TooltipProps['placemen
 
 const tooltipLabels: Record<string, string> = {
   'name': 'שם',
-  'origin_p1_grandpa': 'מוצא סבא מצד אבא',
-  'origin_p1_grandma': 'מוצא סבתא מצד אבא',
-  'origin_p2_grandpa': 'מוצא סבא מצד אמא',
-  'origin_p2_grandma': 'מוצא סבתא מצד אמא',
+  'origin_p1_grandpa': 'מוצא סבא מצד הורה 1',
+  'origin_p1_grandma': 'מוצא סבתא מצד הורה 1',
+  'origin_p2_grandpa': 'מוצא סבא מצד הורה 2',
+  'origin_p2_grandma': 'מוצא סבתא מצד הורה 2',
   'belonging': 'שייכות',
   'countryToLive': 'מדינה למגורים',
   'languageToSpeak': 'שפה מועדפת',

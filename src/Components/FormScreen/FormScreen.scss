@@ -156,7 +156,7 @@
     // padding-inline: 2rem;
 
     .reset-form-button {
-      background-color: $text-color;
+      background-color: $onSelect-Color;
       color: white;
       border-radius: 9999px !important;
       padding: 0.75rem 2.5rem !important;
@@ -191,7 +191,7 @@
       }
 
       .print-button {
-        background-color: $text-color;
+        background-color: $onSelect-Color;
         color: white;
         border-radius: 9999px !important;
         padding: 0.75rem 2.5rem !important;
@@ -298,7 +298,7 @@
         }
 
         &.active {
-          background-color: $text-color;
+          background-color: $onSelect-Color;
           color: white;
           font-weight: $font-weight-bold;
         }
