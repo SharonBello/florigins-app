@@ -78,7 +78,7 @@ export const Flower = ({ answers }: { answers: Answers }) => {
   return (
     <div className="flower-container">
       {/* Adjusted viewBox for better centering */}
-      <svg viewBox="-75 -125 450 450" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox="-50 -100 400 400" preserveAspectRatio="xMidYMid meet">
         <defs>
           {allPetals.map(p => (
             <linearGradient key={p.gradientId} id={p.gradientId} gradientTransform="rotate(90)">
@@ -97,7 +97,7 @@ export const Flower = ({ answers }: { answers: Answers }) => {
           <g className="petal-layer">
             {sortedPetals.map(pd => {
               const isBasePetal = basePetalKeys.has(pd.key);
-              const scale = isBasePetal ? 0.4 : 0.3; // Made petals smaller
+              const scale = isBasePetal ? 0.4 : 0.39; // Made petals smaller
               const radialOffset = isBasePetal ? -48 : -42; // Brought them closer to the center
 
               return (
@@ -165,7 +165,7 @@ export const Flower = ({ answers }: { answers: Answers }) => {
             {/* Childhood Accents - Inside inner petals */}
             {childhoodAccentElement && innerPetals.map(p => {
               return (
-                <g key={`c-${p.key}`} transform={`translate(100, 100) rotate(${p.rotation}) translate(0, -65)`}>
+                <g key={`c-${p.key}`} transform={`translate(100, 100) rotate(${p.rotation}) translate(0, -68)`}>
                   <g transform="scale(0.5)">
                     {childhoodAccentElement}
                   </g>
