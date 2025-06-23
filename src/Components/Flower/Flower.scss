@@ -1,9 +1,12 @@
+@use "sass:color";
+@import "../../styles/variables.scss";
+
 .flower-container {
-    width: 80%;
-    height: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 80%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @keyframes fadeIn {
@@ -14,23 +17,62 @@
     opacity: 1;
   }
 }
-
 @keyframes growIn {
-    from {
-        transform: scale(0.3);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.petal-enter, .accent-enter {
+.petal-enter,
+.accent-enter {
   animation: fadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .center-enter {
-    // transform-origin: 50% 50%;
-    animation: growIn 0.5s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: growIn 0.5s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.petal-group {
+  cursor: pointer;
+}
+.petal-visuals {
+  transition: transform 0.3s ease-out;
+  transform-origin: 0 0;
+}
+.petal-group:hover .petal-visuals {
+  transform: scale(1.05);
+}
+.center-layer-group .petal-visuals {
+  transform-origin: center;
+}
+
+.custom-tooltip {
+  background-color: #fff !important;
+  color: #333 !important; 
+  border-radius: 48px !important;
+  padding: 10px 20px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  text-align: right;
+  direction: rtl;
+
+  .MuiTypography-root {
+    letter-spacing: 0.2em;
+    font-family: $main-font;
+    font-weight: $font-weight-light;
+    color: $text-color;
+  }
+
+  // Set the specific font sizes for the two lines of text
+  .MuiTypography-caption {
+    font-size: 1rem !important; // Slightly smaller for the label
+    opacity: 0.8;
+  }
+  .MuiTypography-body2 {
+    font-size: 1rem !important; // The large font size for the value
+  }
 }

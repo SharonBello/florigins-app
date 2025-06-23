@@ -1,9 +1,11 @@
-import React, { type JSX } from 'react';
+import { useState, type JSX } from 'react';
 import './Flower.scss';
 import type { Answers } from '../../types/Answers';
-import { centerShapes, childhoodEnvironmentAccents, dietAccents, flowerDefinitions, petalShapes, politicalViewAccents, religionAccents, sexualOrientationAccents } from '../../data/appData';
+import { centerShapes, childhoodEnvironmentAccents, dietAccents, flowerDefinitions, petalShapes, politicalViewAccents, questions, religionAccents, sexualOrientationAccents } from '../../data/appData';
+import type { Question } from '../../types/Question';
+import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';
+import { Typography } from '@mui/material';
 
-// The PetalInfo interface can be simplified as we build it dynamically
 interface PetalInfo {
   key: string;
   rotation: number;
@@ -12,17 +14,12 @@ interface PetalInfo {
   ShapeComponent: () => JSX.Element;
 }
 
-// --- LAYOUT CONFIGURATION ---
-// This object maps each answer key to its fixed position on the flower.
-// You can adjust the rotation values here to change the layout.
 const petalLayout: Record<string, { rotation: number }> = {
-  // Base Petals (Grandparents) - In order of the questions
   'origin_p1_grandpa': { rotation: 45 },   // 1st Question -> Top-Right
   'origin_p1_grandma': { rotation: 135 },  // 2nd Question -> Top-Left
   'origin_p2_grandpa': { rotation: 315 },  // 3rd Question -> Bottom-Left
   'origin_p2_grandma': { rotation: 225 },  // 4th Question -> Bottom-Right
 
-  // Inner Petals
   'countryToLive': { rotation: 180 },
   'languageToSpeak': { rotation: 90 },
   'favoriteCuisine': { rotation: 270 },
@@ -31,13 +28,41 @@ const petalLayout: Record<string, { rotation: number }> = {
 
 const basePetalKeys = new Set(['origin_p1_grandpa', 'origin_p1_grandma', 'origin_p2_grandpa', 'origin_p2_grandma']);
 
+const getTooltipConfig = (rotation: number): { placement: TooltipProps['placement'], offset: [number, number] } => {
+  if (rotation === 0) return { placement: 'top', offset: [0, 25] };
+  if (rotation === 90) return { placement: 'right', offset: [0, 15] };
+  if (rotation === 180) return { placement: 'bottom', offset: [0, 15] };
+  if (rotation === 270) return { placement: 'left', offset: [0, -15] };
 
+  if (rotation === 45) return { placement: 'top-end', offset: [140, -70] };
+  if (rotation === 135) return { placement: 'bottom-end', offset: [140, -70] };
+  if (rotation === 225) return { placement: 'bottom-start', offset: [-150, -70] };
+  if (rotation === 315) return { placement: 'top-start', offset: [-150, -70] };
 
-// --- THE MAIN FLOWER COMPONENT ---
+  return { placement: 'top', offset: [0, -15] }; // Default
+};
+
+const tooltipLabels: Record<string, string> = {
+  'name': 'שם',
+  'origin_p1_grandpa': 'מוצא סבא מצד אבא',
+  'origin_p1_grandma': 'מוצא סבתא מצד אבא',
+  'origin_p2_grandpa': 'מוצא סבא מצד אמא',
+  'origin_p2_grandma': 'מוצא סבתא מצד אמא',
+  'belonging': 'שייכות',
+  'countryToLive': 'מדינה למגורים',
+  'languageToSpeak': 'שפה מועדפת',
+  'favoriteCuisine': 'מטבח אהוב',
+  'cultureToBelong': 'תרבות להשתייכות',
+  'childhoodEnvironment': 'סביבת ילדות',
+  'sexualOrientation': 'נטייה מינית',
+  'religion': 'דת',
+  'politicalView': 'השקפה פוליטית',
+  'diet': 'תזונה',
+};
+
 export const Flower = ({ answers }: { answers: Answers }) => {
-  console.log('Answers received by Flower component:', answers);
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
-  // Dynamically build the list of petals based on the provided answers
   const allPetals = Object.keys(answers).map((key): PetalInfo | null => {
     const countryName = answers[key] as string;
     const layoutInfo = petalLayout[key];
@@ -62,7 +87,6 @@ export const Flower = ({ answers }: { answers: Answers }) => {
 
   // Get the data for each dynamic part of the flower
   const CenterShapeComponent = centerShapes[answers.genderIdentity as string] || null;
-  // ... (the rest of your accent logic remains the same)
   const OrientationAccentComponent = sexualOrientationAccents[answers.sexualOrientation as string] || null;
   const ReligionAccentElement = religionAccents[answers.religion as string] || null;
   const DietAccentComponent = dietAccents[answers.diet as string] || null;
@@ -75,10 +99,42 @@ export const Flower = ({ answers }: { answers: Answers }) => {
   const rightPetal = innerPetals.find(p => p.rotation === 270);
   const leftPetal = innerPetals.find(p => p.rotation === 90);
 
+  const getDisplayValue = (question: Question, value: string): string => {
+    if (question.type.includes('_select') && value) {
+      const definition = flowerDefinitions.find(def => def.country === value);
+      if (definition) {
+        switch (question.type) {
+          case 'country_select': return definition.countryHebrew;
+          case 'language_select': return definition.languageHebrew;
+          case 'cuisine_select': return definition.cuisineHebrew;
+          case 'culture_select': return definition.cultureHebrew;
+          default: return value;
+        }
+      }
+    }
+    return value;
+  };
+
+  const renderTooltipTitle = (itemKey: string) => {
+    const question = questions.find(q => q.id === itemKey);
+    const answerValue = answers[itemKey] as string;
+    if (!question || !answerValue) return "";
+
+    const displayValue = getDisplayValue(question, answerValue);
+    const label = tooltipLabels[itemKey] || question.label;
+
+    return (
+      <div>
+        <Typography variant="caption" display="block">{label}:</Typography>
+        <Typography variant="body2" style={{ fontWeight: 500 }}>{displayValue}</Typography>
+      </div>
+    );
+  };
+
   return (
     <div className="flower-container">
       {/* Adjusted viewBox for better centering */}
-      <svg viewBox="-50 -100 400 400" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox="-95 -95 390 390" preserveAspectRatio="xMidYMid meet">
         <defs>
           {allPetals.map(p => (
             <linearGradient key={p.gradientId} id={p.gradientId} gradientTransform="rotate(90)">
@@ -97,15 +153,46 @@ export const Flower = ({ answers }: { answers: Answers }) => {
           <g className="petal-layer">
             {sortedPetals.map(pd => {
               const isBasePetal = basePetalKeys.has(pd.key);
-              const scale = isBasePetal ? 0.4 : 0.39; // Made petals smaller
-              const radialOffset = isBasePetal ? -48 : -42; // Brought them closer to the center
+              const scale = isBasePetal ? 0.4 : 0.39;
+              const radialOffset = isBasePetal ? -48 : -42;
+
+              const { placement, offset } = getTooltipConfig(pd.rotation);
 
               return (
-                <g key={pd.key} transform={`translate(100, 100) rotate(${pd.rotation}) translate(0, ${radialOffset})`} filter="url(#drop-shadow)" fill={`url(#${pd.gradientId})`}>
-                  <g transform={`scale(${scale})`}>
-                    <pd.ShapeComponent />
+                <Tooltip
+                  title={renderTooltipTitle(pd.key)}
+                  placement={placement}
+                  key={pd.key}
+                  // --- UPDATED: Use slotProps to apply a custom class ---
+                  slotProps={{
+                    tooltip: {
+                      className: 'custom-tooltip'
+                    },
+                    popper: {
+                      modifiers: [
+                        {
+                          name: 'offset',
+                          options: {
+                            offset: offset,
+                          },
+                        },
+                      ],
+                    },
+                  }}
+                >
+                  <g
+                    className="petal-group"
+                    transform={`translate(100, 100) rotate(${pd.rotation}) translate(0, ${radialOffset})`}
+                    onMouseEnter={() => setHoveredKey(pd.key)}
+                    onMouseLeave={() => setHoveredKey(null)}
+                  >
+                    <g className={`petal-visuals ${hoveredKey === pd.key ? 'hovered' : ''}`}>
+                      <g transform={`scale(${scale})`} filter="url(#drop-shadow)" fill={`url(#${pd.gradientId})`}>
+                        <pd.ShapeComponent />
+                      </g>
+                    </g>
                   </g>
-                </g>
+                </Tooltip>
               );
             })}
           </g>
@@ -123,7 +210,6 @@ export const Flower = ({ answers }: { answers: Answers }) => {
 
             {/* Sexual Orientation Accents - On tips of outer petals */}
             {OrientationAccentComponent && topAndBottomInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
-              // We iterate over the new filtered list
               <g key={`so-${petal.key}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(25, -68)`}>
                 <OrientationAccentComponent fill={`url(#${petal.gradientId})`} />
               </g>
@@ -165,8 +251,8 @@ export const Flower = ({ answers }: { answers: Answers }) => {
             {/* Childhood Accents - Inside inner petals */}
             {childhoodAccentElement && innerPetals.map(p => {
               return (
-                <g key={`c-${p.key}`} transform={`translate(100, 100) rotate(${p.rotation}) translate(0, -68)`}>
-                  <g transform="scale(0.5)">
+                <g key={`c-${p.key}`} transform={`translate(100, 100) rotate(${p.rotation}) translate(0, -76)`}>
+                  <g transform="scale(0.6)">
                     {childhoodAccentElement}
                   </g>
                 </g>

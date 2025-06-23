@@ -5,7 +5,6 @@
   display: grid;
   grid-template-columns: 1fr 80%;
   grid-template-rows: 1fr;
-  // height: 100vh;
   grid-template-areas: "form-panel flower-panel";
   max-height: 90vh;
   width: 97%;
@@ -21,10 +20,10 @@
       width: 100%;
       padding-bottom: 0.5rem;
       display: flex;
-      justify-content: space-between; // Pushes children to opposite ends
-      align-items: center; // Aligns them vertically
-      border-bottom: 1px solid #e0e0e0; // Replaces the old <hr /> tag
-      padding-bottom: 0.5rem; // Adds some space above the line
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+      padding-bottom: 0.5rem;
       margin-bottom: 1rem;
 
       .app-name,
@@ -164,13 +163,11 @@
       font-family: $main-font !important;
       width: 12rem;
       transition:
-      background-color 0.3s,
-      opacity 0.3s;
+        background-color 0.3s,
+        opacity 0.3s;
       cursor: pointer;
-      // flex: 0.4;
-      
+
       &:hover {
-        // background-color: darken($button-background-color, 80%);
         background: color.scale($button-background-color, $lightness: -80%);
       }
     }
@@ -180,19 +177,19 @@
       align-items: center;
       justify-content: center;
       gap: 0.75rem;
-      
+
       .validation-message {
         color: #888;
         font-family: $main-font;
         height: 1.2rem;
         transition: opacity 0.3s ease-out;
         opacity: 1;
-        
+
         &.is-hidden {
           opacity: 0;
         }
       }
-      
+
       .print-button {
         background-color: $text-color;
         color: white;
@@ -200,13 +197,12 @@
         padding: 0.75rem 2.5rem !important;
         font-family: $main-font !important;
         transition:
-        background-color 0.3s,
-        opacity 0.3s;
+          background-color 0.3s,
+          opacity 0.3s;
         cursor: pointer;
         width: 12rem;
 
         &:disabled {
-          // background-color: darken($button-background-color, 10%);
           background: color.scale($button-background-color, $lightness: -10%);
 
           opacity: 0.7;
@@ -214,7 +210,6 @@
         }
 
         &:hover {
-          // background-color: darken($button-background-color, 80%);
           background: color.scale($button-background-color, $lightness: -80%);
         }
       }
@@ -299,7 +294,6 @@
         font-weight: $font-weight-light;
 
         &:hover {
-          // background-color: darken($button-background-color, 3%);
           background: color.scale($button-background-color, $lightness: -3%);
         }
 
@@ -334,22 +328,24 @@
       font-weight: $font-weight-light;
     }
 
-    .input-underline {
-      border-radius: 25px;
-      border: none;
-      font-size: 1rem;
-      padding: 4px 12px;
-      margin-bottom: 0.75rem;
-      flex: 0.7;
-      width: 50px;
-      appearance: unset;
-      font-family: $main-font;
-      font-weight: $font-weight-light;
-
-      &:active,
-      &:hover {
+    .custom-select-wrapper {
+      .input-underline {
+        border-radius: 25px;
         border: none;
-        outline: none;
+        font-size: 1rem;
+        padding: 4px 12px;
+        margin-bottom: 0.75rem;
+        flex: 0.7;
+        width: 180px;
+        appearance: unset;
+        font-family: $main-font;
+        font-weight: $font-weight-light;
+
+        &:active,
+        &:hover {
+          border: none;
+          outline: none;
+        }
       }
     }
   }
@@ -463,22 +459,23 @@
       font-family: $main-font;
       font-weight: $font-weight-light;
     }
-
-    .input-underline {
-      border-radius: 25px;
-      border: none;
-      font-size: 1rem;
-      padding: 4px 12px;
-      flex: 0.7;
-      width: 50px;
-      appearance: unset;
-      font-family: $main-font;
-      font-weight: $font-weight-light;
-
-      &:active,
-      &:hover {
+    .custom-select-wrapper {
+      .input-underline {
+        border-radius: 25px;
         border: none;
-        outline: none;
+        font-size: 1rem;
+        padding: 4px 12px;
+        flex: 0.7;
+        width: 180px;
+        appearance: unset;
+        font-family: $main-font;
+        font-weight: $font-weight-light;
+
+        &:active,
+        &:hover {
+          border: none;
+          outline: none;
+        }
       }
     }
   }
