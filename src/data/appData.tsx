@@ -223,6 +223,39 @@ export const flowerDefinitions: FlowerDefinition[] = [
   { country: 'Vanuatu', countryHebrew: 'ונואטו', continent: 'Oceania', continentHebrew: 'אוקיאניה', scientificName: 'Hibiscus (Hibiscus rosa-sinensis)', scientificNameHebrew: 'Hibiscus (Hibiscus rosa-sinensis)', gradientStops: ['#D2042D', '#B20326', '#93021F', '#730218'], languageHebrew: 'ביסלמה', cultureHebrew: 'ונואטית', cuisineHebrew: 'ונואטי' }
 ];
 
+export const continentGradients: Record<string, string[]> = {
+  'Africa': ['#F2A05F', '#7B1E3A'],
+  'Asia': ['#F7DE99', '#3E6E7E'],
+  'Europe': ['#781E3A', '#1F2977'],
+  'North America': ['#3A625D', '#2E3556'],
+  'South America': ['#EF608F', '#388A3A'],
+  'Oceania': ['#5398BB', '#E0EDF3'],
+};
+
+export const continentCombinationGradients: Record<string, string[]> = {
+  "Africa-Africa": ["#F2A05F", "#3B8A3A", "#7B1E3A"],
+  "Africa-Asia": ["#F2A05F", "#F7D876", "#3E6E7E"],
+  "Africa-Europe": ["#F2A05F", "#7B1E3A", "#1F2977"],
+  "Africa-North America": ["#F2A05F", "#AF533E", "#203556"],
+  "Africa-South America": ["#F2A05F", "#EF608F", "#3B8A3A"],
+  "Africa-Oceania": ["#F2A05F", "#D2DE87", "#E0EDF3"],
+  "Asia-Asia": ["#F7D876", "#C8C99B", "#3E8E7E"],
+  "Asia-Europe": ["#F7D876", "#7B1E3A", "#1F2977"],
+  "Asia-North America": ["#F7D876", "#AF533E", "#203556"],
+  "Asia-South America": ["#F7D876", "#EF608F", "#3B8A3A"],
+  "Asia-Oceania": ["#F7D876", "#D2DE87", "#E0EDF3"],
+  "Europe-Europe": ["#7B1E3A", "#921E4A", "#1F2977"],
+  "Europe-North America": ["#7B1E3A", "#AF533E", "#203556"],
+  "Europe-South America": ["#7B1E3A", "#EF608F", "#3B8A3A"],
+  "Europe-Oceania": ["#7B1E3A", "#D2DE87", "#E0EDF3"],
+  "North America-North America": ["#3A6250", "#AF533E", "#203556"],
+  "North America-South America": ["#3A6250", "#EF608F", "#3B8A3A"],
+  "North America-Oceania": ["#3A6250", "#D2DE87", "#E0EDF3"],
+  "South America-South America": ["#EF608F", "#CF0502", "#3B8A3A"],
+  "South America-Oceania": ["#EF608F", "#D2DE87", "#E0EDF3"],
+  "Oceania-Oceania": ["#5398BB", "#D2DE87", "#E0EDF3"]
+};
+
 export const questions: Question[] = [
   { id: 'name', label: 'שם', type: 'text' },
   { id: 'genderIdentity', label: 'זהות מגדרית', type: 'tabs', options: ['גבר', 'אשה', 'א-בינארי', 'גבר טראנס', 'אשה טראנסית', 'ללא הגדרה'] },
@@ -465,30 +498,30 @@ export const dietAccents: Record<string, (props: { fill: string }) => JSX.Elemen
 };
 
 // Dots inside inner petals, based on Childhood Environment
-export const childhoodEnvironmentAccents: Record<string, React.ReactElement> = {
-  'עיר': ( // City - Uses the shape you provided
-    <g transform="translate(-6, 55)">
-      <rect x="8.4" y="3.04" width="3.73" height="11.8" rx="1.86" transform="rotate(180 8.4 3.04)" fill="#fff" strokeWidth="0" />
-      <circle cx="19" cy="-5" r="1.74" transform="rotate(-180 12.78 1.84)" fill="#fff" strokeWidth="0" />
+export const childhoodEnvironmentAccents: Record<string, (props: { fill: string }) => JSX.Element> = {
+  'עיר': ({ fill }: { fill: string }) => ( // City - Uses the shape you provided
+    <g transform="translate(-6, 55)" fill={fill}>
+      <rect x="8.4" y="3.04" width="3.73" height="11.8" rx="1.86" transform="rotate(180 8.4 3.04)" fill={fill} strokeWidth="0" />
+      <circle cx="19" cy="-5" r="1.74" transform="rotate(-180 12.78 1.84)" fill={fill} strokeWidth="0" />
     </g>
   ),
-  'מושב': ( // Moshav - Two vertical dots
-    <g transform="translate(-14, 55) rotate(-45)">
-      <rect x="8.98169" y="11.8398" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-135 8.98169 11.8398)" fill="#fff" strokeWidth="0" />
-      <rect x="2.30566" y="3.42432" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-15 2.30566 3.42432)" fill="#fff" strokeWidth="0" />
-      <rect width="1.89025" height="5.9858" rx="0.945127" transform="matrix(0.258819 -0.965926 -0.965926 -0.258819 16.0586 17.1769)" fill="#fff" strokeWidth="0" />
+  'מושב': ({ fill }: { fill: string }) => (  // Moshav - Two vertical dots
+    <g transform="translate(-14, 55) rotate(-45)" fill={fill}>
+      <rect x="8.98169" y="11.8398" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-135 8.98169 11.8398)" fill={fill} strokeWidth="0" />
+      <rect x="2.30566" y="3.42432" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-15 2.30566 3.42432)" fill={fill} strokeWidth="0" />
+      <rect width="1.89025" height="5.9858" rx="0.945127" transform="matrix(0.258819 -0.965926 -0.965926 -0.258819 16.0586 17.1769)" fill={fill} strokeWidth="0" />
     </g>
   ),
-  'קיבוץ': ( // Kibbutz - Three dots in a triangle
-    <g transform="translate(-8, 55) rotate(-45)">
-      <circle cx="8.43894" cy="10.6223" r="1.24384" transform="rotate(135 8.43894 10.6223)" fill="#fff" strokeWidth="0" />
-      <circle cx="2.28196" cy="4.46539" r="1.24384" transform="rotate(135 2.28196 4.46539)" fill="#fff" strokeWidth="0" />
-      <rect x="7.30078" y="6.33929" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-135 7.30078 6.33929)" fill="#fff" strokeWidth="0" />
+  'קיבוץ': ({ fill }: { fill: string }) => (  // Kibbutz - Three dots in a triangle
+    <g transform="translate(-8, 55) rotate(-45)" fill={fill}>
+      <circle cx="8.43894" cy="10.6223" r="1.24384" transform="rotate(135 8.43894 10.6223)" fill={fill} strokeWidth="0" />
+      <circle cx="2.28196" cy="4.46539" r="1.24384" transform="rotate(135 2.28196 4.46539)" fill={fill} strokeWidth="0" />
+      <rect x="7.30078" y="6.33929" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-135 7.30078 6.33929)" fill={fill} strokeWidth="0" />
     </g>
   ),
-  'אחר': ( // Other - A single larger dot
-    <g transform="translate(0, 55)">
-      <circle cx="0" cy="0" r="2.5" fill="#fff" strokeWidth="0" />
+  'אחר': ({ fill }: { fill: string }) => (  // Other - A single larger dot
+    <g transform="translate(0, 55)" fill={fill}>
+      <circle cx="0" cy="0" r="2.5" fill={fill} strokeWidth="0" />
     </g>
   ),
 };

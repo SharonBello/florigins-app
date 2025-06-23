@@ -1,7 +1,7 @@
-import { useState, type JSX } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import './Flower.scss';
 import type { Answers } from '../../types/Answers';
-import { centerShapes, childhoodEnvironmentAccents, dietAccents, flowerDefinitions, petalShapes, politicalViewAccents, questions, religionAccents, sexualOrientationAccents } from '../../data/appData';
+import { centerShapes, childhoodEnvironmentAccents, continentCombinationGradients, dietAccents, flowerDefinitions, petalShapes, politicalViewAccents, questions, religionAccents, sexualOrientationAccents } from '../../data/appData';
 import type { Question } from '../../types/Question';
 import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';
 import { Typography } from '@mui/material';
@@ -85,12 +85,30 @@ export const Flower = ({ answers }: { answers: Answers }) => {
     return 0;
   });
 
+  const childhoodAccentGradient = useMemo((): string[] | null => {
+    const belonging = answers.belonging as number;
+    if (belonging === 0 || belonging === undefined) return null;
+
+    const side1 = [answers.origin_p1_grandpa, answers.origin_p1_grandma].map(cn => flowerDefinitions.find(f => f.country === cn)?.continent).filter((c): c is string => Boolean(c)).sort();
+    const side2 = [answers.origin_p2_grandpa, answers.origin_p2_grandma].map(cn => flowerDefinitions.find(f => f.country === cn)?.continent).filter((c): c is string => Boolean(c)).sort();
+
+    let comboKey: string | null = null;
+    if (belonging === -1 && side1.length === 2) comboKey = side1.join('-');
+    else if (belonging === 1 && side2.length === 2) comboKey = side2.join('-');
+
+    if (!comboKey) return null;
+
+    const raw = continentCombinationGradients[comboKey];
+    if (!raw) return null;
+    return raw;
+  }, [answers.belonging, answers.origin_p1_grandpa, answers.origin_p1_grandma, answers.origin_p2_grandpa, answers.origin_p2_grandma]);
+
   // Get the data for each dynamic part of the flower
   const CenterShapeComponent = centerShapes[answers.genderIdentity as string] || null;
   const OrientationAccentComponent = sexualOrientationAccents[answers.sexualOrientation as string] || null;
   const ReligionAccentElement = religionAccents[answers.religion as string] || null;
   const DietAccentComponent = dietAccents[answers.diet as string] || null;
-  const childhoodAccentElement = childhoodEnvironmentAccents[answers.childhoodEnvironment as string] || null;
+  const ChildhoodComponent = childhoodEnvironmentAccents[answers.childhoodEnvironment as string] || null;
 
   const innerPetals = allPetals.filter(p => !basePetalKeys.has(p.key));
   const topAndBottomInnerPetals = innerPetals.filter(p => p.rotation === 0 || p.rotation === 180);
@@ -143,6 +161,21 @@ export const Flower = ({ answers }: { answers: Answers }) => {
               ))}
             </linearGradient>
           ))}
+          {childhoodAccentGradient && (
+            <linearGradient
+              id="childhood-gradient"
+              gradientTransform="rotate(90)"
+            >
+              {childhoodAccentGradient.map((color, i) => (
+                <stop
+                  key={i}
+                  offset={`${(i / (childhoodAccentGradient.length - 1)) * 100}%`}
+                  stopColor={color}
+                />
+              ))}
+            </linearGradient>
+          )}
+
           <filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">
             <feDropShadow dx="0.5" dy="1" stdDeviation="1" floodColor="#000000" floodOpacity="0.2" />
           </filter>
@@ -249,15 +282,19 @@ export const Flower = ({ answers }: { answers: Answers }) => {
             ))}
 
             {/* Childhood Accents - Inside inner petals */}
-            {childhoodAccentElement && innerPetals.map(p => {
-              return (
-                <g key={`c-${p.key}`} transform={`translate(100, 100) rotate(${p.rotation}) translate(0, -76)`}>
-                  <g transform="scale(0.6)">
-                    {childhoodAccentElement}
-                  </g>
+            {ChildhoodComponent && innerPetals.map((p): JSX.Element => (
+              <g
+                key={`c-${p.key}`}
+                transform={`translate(100,100) rotate(${p.rotation}) translate(0,-68)`}
+              >
+                <g transform="scale(0.6)">
+                  {/* use the new gradient or fall back to white */}
+                  <ChildhoodComponent
+                    fill={childhoodAccentGradient ? 'url(#childhood-gradient)' : '#fff'}
+                  />
                 </g>
-              );
-            })}
+              </g>
+            ))}
           </g>
         </g>
       </svg>

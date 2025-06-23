@@ -156,7 +156,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
         return value;
     };
 
-const summaryString = questions
+    const summaryString = questions
         .map(q => {
             const answer = answers[q.id];
             if (answer && q.id !== 'name' && q.id !== 'belonging') {
@@ -385,10 +385,6 @@ const summaryString = questions
                 <div className="form-footer-container screen-only">
                     <hr className="form-border" />
                 </div>
-                {/* Print-only version */}
-                <footer className="print-footer print-only">
-                    <Typography className="summary-text">{summaryString}</Typography>
-                </footer>
             </div>
         </div>
     );
