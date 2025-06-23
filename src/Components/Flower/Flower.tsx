@@ -60,7 +60,7 @@ const tooltipLabels: Record<string, string> = {
   'diet': 'תזונה',
 };
 
-export const Flower = ({ answers }: { answers: Answers }) => {
+export const Flower = ({ answers, viewBox }: { answers: Answers, viewBox: string }) => {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
   const allPetals = Object.keys(answers).map((key): PetalInfo | null => {
@@ -152,7 +152,7 @@ export const Flower = ({ answers }: { answers: Answers }) => {
   return (
     <div className="flower-container">
       {/* Adjusted viewBox for better centering */}
-      <svg viewBox="-95 -95 390 390" preserveAspectRatio="xMidYMid meet">
+      <svg viewBox={viewBox} preserveAspectRatio="xMidYMid meet">
         <defs>
           {allPetals.map(p => (
             <linearGradient key={p.gradientId} id={p.gradientId} gradientTransform="rotate(90)">

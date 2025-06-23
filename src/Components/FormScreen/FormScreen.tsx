@@ -21,7 +21,7 @@ const PrintableFlower = React.forwardRef<HTMLDivElement, { answers: Answers; sum
             <Typography dir="ltr">Florigins</Typography>
         </header>
         <div className="print-flower-container">
-            <Flower answers={answers} />
+            <Flower answers={answers} viewBox = "-95 -95 390 390"/>
         </div>
         <footer className="print-footer">
             <Typography className="summary-text">{summary}</Typography>
@@ -381,7 +381,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     <Typography className="app-name" dir="ltr">Florigins</Typography>
                     {/* <hr className="form-border" /> */}
                 </header>
-                <Flower answers={answers} />
+                <Flower answers={answers} viewBox="0 0 300 300"/>
                 <div className="form-footer-container screen-only">
                     <hr className="form-border" />
                 </div>

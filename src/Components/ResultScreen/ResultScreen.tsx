@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { Flower } from '../Flower/Flower';
 import { useRef } from 'react';
-import ShareIcon from '@mui/icons-material/Share'; 
+import ShareIcon from '@mui/icons-material/Share';
 import './ResultScreen.scss'
 
 export const ResultScreen = () => {
@@ -25,7 +25,7 @@ export const ResultScreen = () => {
             text: 'ראו את פרח המקורות שיצרתי ב-Florigins! בואו ליצור גם את שלכם.',
             url: window.location.href, // This will share the URL of the results page
         };
-        
+
         if (navigator.share) {
             try {
                 await navigator.share(shareData);
@@ -43,36 +43,44 @@ export const ResultScreen = () => {
             });
         }
     };
-    
+
 
     return (
         <>
             <div className="result-screen-container">
                 <header className="result-header">
-                    <span className="result-title">{answers['name'] || 'הפרח שלך'}</span>
-                    <span className="result-title" style={{ direction: 'ltr' }}>Florigins</span>
+                    <div className="results-title-container">
+                        <span className="result-title">{answers['name'] || 'הפרח שלך'}</span>
+                        <span className="result-title" style={{ direction: 'ltr' }}>Florigins</span>
+                    </div>
+                    <hr className="results-border" />
                 </header>
-                
+
                 <div ref={flowerRef} className="flower-display-container">
-                    <Flower answers={answers} />
+                    <Flower answers={answers} viewBox="-40 -50 280 280" />
                 </div>
-                
+
                 <p className="result-description">
                     ...טקסט תיאור הפרח יוצג כאן
                 </p>
 
                 <div className="result-actions">
-                    <Button onClick={handleShare} className="result-button" variant="outlined" startIcon={<ShareIcon />}>
-                        שתף
-                    </Button>
-                    <Button onClick={handleStartOver} className="result-button" variant="outlined">
-                        צור פרח חדש
-                    </Button>
-                     <Button onClick={handleGallery} className="result-button" variant="outlined">
-                        מאגר הפרחים
-                    </Button>
+                    <div className="share-btn-container">
+                        <Button onClick={handleShare} className="result-button" variant="outlined" startIcon={<ShareIcon />}>
+                            שתף
+                        </Button>
+                    </div>
+                    <div className="footer-btn-container">
+                        <Button onClick={handleStartOver} className="result-button" variant="outlined">
+                            צור פרח חדש
+                        </Button>
+                        <Button onClick={handleGallery} className="result-button" variant="outlined">
+                            מאגר הפרחים
+                        </Button>
+                    </div>
                 </div>
             </div>
+            <hr className="results-border" />
         </>
     );
 };
