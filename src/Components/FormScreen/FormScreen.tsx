@@ -381,7 +381,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     <Typography className="app-name" dir="ltr">Florigins</Typography>
                     {/* <hr className="form-border" /> */}
                 </header>
-                <Flower answers={answers} viewBox="0 0 300 300"/>
+                <Flower answers={answers} viewBox="-95 -95 390 390"/>
                 <div className="form-footer-container screen-only">
                     <hr className="form-border" />
                 </div>
