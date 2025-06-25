@@ -1,9 +1,9 @@
 @use "sass:color";
-@import "../../styles/variables.scss";
+@use "../../styles/variables" as *;
 
 .result-screen-container {
     direction: rtl;
-    height: 90%;
+    height: 95%;
     display: grid;
     grid-template-rows: auto // header
         70vh // flower area
@@ -15,6 +15,10 @@
     padding: 2rem;
     justify-items: center;
     animation: fadeIn 1s ease-in-out;
+
+    @media (min-width: 800px) and (max-width: 1800px) {
+        height: 90%;
+    }
 }
 
 @keyframes fadeIn {
@@ -56,6 +60,10 @@
     .flower-container {
         svg {
             width: 60rem;
+
+            @media (min-width: 800px) and (max-width: 1800px) {
+                width: 40rem;
+            }
         }
     }
 }

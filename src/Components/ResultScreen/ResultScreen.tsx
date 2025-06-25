@@ -138,8 +138,8 @@ export const ResultScreen = () => {
                         </Button>
                     </div>
                 </div>
+                <hr className="results-border" />
             </div>
-            <hr className="results-border" />
         </>
     );
 };
