@@ -11,6 +11,10 @@ export const HomeScreen = () => {
         navigate('/form');
     };
 
+    const handleGallery = () => {
+        navigate('/gallery');
+    };
+
     return (
         <div className="homepage-container" dir="rtl">
             <header className="home-header-container">
@@ -24,7 +28,7 @@ export const HomeScreen = () => {
                 </div>
                 <div className="btn-container">
                     <Button onClick={handleStart} className="homepage-button">צור פרח חדש</Button>
-                    <Button className="homepage-button">מאגר הפרחים</Button>
+                    <Button onClick={handleGallery} className="homepage-button">מאגר הפרחים</Button>
                 </div>
             </main>
 

@@ -1,3 +1,5 @@
+import type { Answers } from "./Answers";
+
 export interface FlowerDefinition {
   country: string;
   countryHebrew: string;
@@ -6,4 +8,10 @@ export interface FlowerDefinition {
   scientificName: string;
   scientificNameHebrew: string;
   gradientStops: string[];
+}
+
+export interface FlowerProps {
+  answers: Answers;
+  viewBox: string;
+  showTooltip?: boolean;
 }

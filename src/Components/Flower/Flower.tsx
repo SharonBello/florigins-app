@@ -5,6 +5,7 @@ import { centerShapes, childhoodEnvironmentAccents, continentCombinationGradient
 import type { Question } from '../../types/Question';
 import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';
 import { Typography } from '@mui/material';
+import type { FlowerProps } from '../../types/FlowerDefinition';
 
 interface PetalInfo {
   key: string;
@@ -60,7 +61,7 @@ const tooltipLabels: Record<string, string> = {
   'diet': 'תזונה',
 };
 
-export const Flower = ({ answers, viewBox }: { answers: Answers, viewBox: string }) => {
+export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) => {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
   const allPetals = Object.keys(answers).map((key): PetalInfo | null => {
@@ -190,44 +191,37 @@ export const Flower = ({ answers, viewBox }: { answers: Answers, viewBox: string
               const radialOffset = isBasePetal ? -48 : -42;
 
               const { placement, offset } = getTooltipConfig(pd.rotation);
+              const petalNode = (
+                <g
+                  className="petal-group"
+                  transform={`translate(100, 100) rotate(${pd.rotation}) translate(0, ${radialOffset})`}
+                  onMouseEnter={() => setHoveredKey(pd.key)}
+                  onMouseLeave={() => setHoveredKey(null)}
+                >
+                  <g className={`petal-visuals ${hoveredKey === pd.key ? 'hovered' : ''}`}>
+                    <g transform={`scale(${scale})`} filter="url(#drop-shadow)" fill={`url(#${pd.gradientId})`}>
+                      <pd.ShapeComponent />
+                    </g>
+                  </g>
+                </g>
+              );
 
-              return (
+              return showTooltip ? (
                 <Tooltip
                   title={renderTooltipTitle(pd.key)}
                   placement={placement}
                   key={pd.key}
-                  // --- UPDATED: Use slotProps to apply a custom class ---
                   slotProps={{
-                    tooltip: {
-                      className: 'custom-tooltip'
-                    },
-                    popper: {
-                      modifiers: [
-                        {
-                          name: 'offset',
-                          options: {
-                            offset: offset,
-                          },
-                        },
-                      ],
-                    },
+                    tooltip: { className: 'custom-tooltip' },
+                    popper: { modifiers: [{ name: 'offset', options: { offset } }] }
                   }}
                 >
-                  <g
-                    className="petal-group"
-                    transform={`translate(100, 100) rotate(${pd.rotation}) translate(0, ${radialOffset})`}
-                    onMouseEnter={() => setHoveredKey(pd.key)}
-                    onMouseLeave={() => setHoveredKey(null)}
-                  >
-                    <g className={`petal-visuals ${hoveredKey === pd.key ? 'hovered' : ''}`}>
-                      <g transform={`scale(${scale})`} filter="url(#drop-shadow)" fill={`url(#${pd.gradientId})`}>
-                        <pd.ShapeComponent />
-                      </g>
-                    </g>
-                  </g>
+                  {petalNode}
                 </Tooltip>
+              ) : (
+                petalNode
               );
-            })}
+            })};  
           </g>
 
           <g className="center-layer" transform="translate(100, 100) scale(0.8)" filter="url(#drop-shadow)">

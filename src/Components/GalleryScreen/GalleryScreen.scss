@@ -1,0 +1,255 @@
+@use "../../styles/variables.scss" as *;
+@use "sass:color";
+
+.gallery-screen-container {
+  display: grid;
+  grid-template-columns: 25% 75%;
+  grid-template-areas: "filter-panel main-panel";
+  width: 100%;
+  max-width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  direction: rtl;
+}
+
+.gallery-main-panel {
+  grid-area: main-panel;
+  padding: 2rem;
+  overflow-y: auto;
+
+  .gallery-header {
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    hr {
+      border: 0;
+      border-top: 1px solid $border-color;
+      opacity: 0.3;
+    }
+    .app-name {
+      text-align: left;
+      letter-spacing: 0.2em;
+      font-family: $main-font;
+      font-weight: $font-weight-light;
+    }
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2.5rem 2rem;
+  }
+
+  .gallery-item {
+    cursor: pointer;
+    text-align: center;
+    transition: transform 0.2s ease-out;
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+
+  .gallery-flower-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .gallery-item-name {
+    font-family: $main-font;
+    font-weight: $font-weight-light;
+    font-size: 1rem;
+    color: $text-color;
+  }
+}
+
+.gallery-filter-panel {
+  grid-area: filter-panel;
+  background: $background-color;
+  border-left: 1px solid $border-color;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 100%;
+
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: $text-color;
+    font-family: $main-font;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid $border-color;
+    flex-shrink: 0;
+    padding: 1.5rem;
+
+    .back-button {
+      color: #888;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      &:hover {
+        color: $text-color;
+      }
+    }
+  }
+
+  .filter-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+
+    min-height: 0%;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #fff;
+      border-radius: 4px;
+    }
+
+    @media (min-width: 800px) and (max-width: 1800px) {
+      max-height: 80vh;
+    }
+
+    .filter-label-item {
+      height: 100%;
+      border-bottom: 1px solid $border-color;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 1.5rem;
+      cursor: pointer;
+
+      p {
+        color: $text-color;
+        font-family: $main-font;
+        font-weight: $font-weight-light;
+        letter-spacing: 0.2em;
+        padding: 0;
+        margin-block-start: 0;
+        margin-block-end: 0;
+      }
+
+      &.hover {
+        background-color: $onSelect-Color;
+        // color: white;
+        font-weight: $font-weight-bold;
+      }
+
+      &.active {
+        background-color: $onSelect-Color;
+        color: white;
+        font-weight: $font-weight-bold;
+      }
+    }
+  }
+
+  .filter-section {
+    flex: 1;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid $border-color;
+
+    .filter-title {
+      font-family: $main-font;
+      font-weight: $font-weight-regular;
+      margin-bottom: 1rem;
+      text-align: right;
+      font-size: 1.1rem;
+    }
+    .filter-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .filter-select-container {
+      .MuiInput-underline:before,
+      .MuiInput-underline:after {
+        border-bottom: none;
+      }
+      .filter-select {
+        background-color: #fff;
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-family: $main-font;
+      }
+    }
+  }
+}
+
+.gallery-content {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 80%;
+  align-items: center;
+  justify-content: center;
+
+  .gallery-group {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+
+    h5 {
+      margin-block-start: -30px;
+      letter-spacing: 0.2em;
+      font-family: $main-font;
+      font-weight: $font-weight-light;
+    }
+  }
+}
+.gallery-bunch-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  // padding-left: 50px; // Add some padding to not get cut off
+}
+
+.gallery-item {
+  cursor: pointer;
+  width: 250px;
+  height: 250px;
+  position: relative;
+  z-index: 1;
+  transition:
+    transform 0.3s ease-out,
+    z-index 0s 0.3s;
+  transform-origin: center bottom;
+
+  // The key to the overlap effect
+  &:not(:first-child) {
+    margin-right: -165px; // Pull items to the left to overlap
+  }
+
+  &:hover {
+    transform: scale(1.1) translateY(-15px);
+    z-index: 10; // Bring the hovered item to the front
+    transition:
+      transform 0.3s ease-out,
+      z-index 0s 0s;
+  }
+}
+
+.gallery-flower-container {
+  width: 100%;
+  height: 100%;
+}
+
+// This hides the name text below the flower in the gallery
+.gallery-item-name {
+  display: none;
+}
