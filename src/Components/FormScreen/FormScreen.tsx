@@ -16,11 +16,11 @@ const PrintableFlower = React.forwardRef<HTMLDivElement, { answers: Answers; sum
     { answers, summary }, ref) => (
     <div className="print-layout" ref={ref}>
         <header className="print-header">
-            <Typography>{(answers.name as string) || 'הפרח שלך'}</Typography>
+            <Typography style={{fontFamily: 'Heebo'}}>{(answers.name as string) || 'הפרח שלך'}</Typography>
             <Typography dir="ltr">Florigins</Typography>
         </header>
         <div className="print-flower-container">
-            <Flower answers={answers} viewBox="-25 -25 250 250" />
+             <Flower answers={answers} viewBox="-50 -50 300 300" />
         </div>
         <footer className="print-footer">
             <Typography className="summary-text">{summary}</Typography>
