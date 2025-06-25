@@ -1,6 +1,5 @@
 import type { JSX } from "@emotion/react/jsx-runtime";
 import type { Question } from "../types/Question";
-import React from 'react';
 
 export interface FlowerDefinition {
   country: string;
@@ -318,58 +317,52 @@ export const petalShapes: Record<string, () => JSX.Element> = {
   )
 };
 
-const commonShapeProps = {
-  fill: "#fff",
+// Common SVG shape props for center shapes
+const commonCenterShapeProps = {
   strokeWidth: 0.5,
   strokeOpacity: 0.8,
   stroke: "#F7F0E6",
 };
 
-// Center shapes based on Gender Identity
-export const centerShapes: Record<string, () => JSX.Element> = {
-  'אשה': () => (
-    <g transform="translate(-38.5, -38) scale(0.6)">
-      <rect x="124.412" y="85.3914" width="27.3539" height="120.734" rx="13.6769" transform="rotate(135 124.412 85.3914)" {...commonShapeProps} />
-      <rect x="105.042" y="104.758" width="27.3539" height="120.734" rx="13.6769" transform="rotate(135 105.042 104.758)" {...commonShapeProps} />
-      <rect x="39.0603" y="124.1" width="27.3539" height="120.734" rx="13.6769" transform="rotate(-135 39.0603 124.1)" {...commonShapeProps} />
-      <rect x="19.6941" y="104.731" width="27.3539" height="120.734" rx="13.6769" transform="rotate(-135 19.6941 104.731)" {...commonShapeProps} />
+// --- UPDATED: Center shapes now accept a 'fill' prop ---
+export const centerShapes: Record<string, (props: { fill: string }) => JSX.Element> = {
+  'אשה': ({ fill }) => (
+    <g transform="translate(-38.5, -38) scale(0.6)" fill={fill}>
+      <rect x="124.412" y="85.3914" width="27.3539" height="120.734" rx="13.6769" transform="rotate(135 124.412 85.3914)" {...commonCenterShapeProps} />
+      <rect x="105.042" y="104.758" width="27.3539" height="120.734" rx="13.6769" transform="rotate(135 105.042 104.758)" {...commonCenterShapeProps} />
+      <rect x="39.0603" y="124.1" width="27.3539" height="120.734" rx="13.6769" transform="rotate(-135 39.0603 124.1)" {...commonCenterShapeProps} />
+      <rect x="19.6941" y="104.731" width="27.3539" height="120.734" rx="13.6769" transform="rotate(-135 19.6941 104.731)" {...commonCenterShapeProps} />
     </g>
   ),
-
-  'גבר': () => (
-    <g transform="rotate(45)">
-      <rect x="-30" y="-30" width="60" height="60" rx="10" {...commonShapeProps} />
+  'גבר': ({ fill }) => (
+    <g transform="rotate(45)" fill={fill}>
+      <rect x="-30" y="-30" width="60" height="60" rx="10" {...commonCenterShapeProps} />
     </g>
   ),
-
-  'א-בינארי': () => (
-    <g>
-      <rect x="-30" y="-30" width="60" height="60" rx="10" {...commonShapeProps} />
+  'א-בינארי': ({ fill }) => (
+    <g fill={fill}>
+      <rect x="-30" y="-30" width="60" height="60" rx="10" {...commonCenterShapeProps} />
     </g>
   ),
-
-  'גבר טראנס': () => (
-    <g>
-      <rect x="-33" y="-33" width="66" height="66" rx="10" {...commonShapeProps} />
+  'גבר טראנס': ({ fill }) => (
+    <g fill={fill}>
+      <rect x="-33" y="-33" width="66" height="66" rx="10" {...commonCenterShapeProps} />
       <g transform="rotate(45)">
-        <rect x="-33" y="-33" width="66" height="66" rx="10" {...commonShapeProps} />
+        <rect x="-33" y="-33" width="66" height="66" rx="10" {...commonCenterShapeProps} />
       </g>
     </g>
   ),
-
-  'אשה טראנסית': () => (
-    <g transform="translate(-52.5, -52) scale(0.6)">
-      <rect x="115.768" y="148.419" width="27.3539" height="120.734" rx="13.6769" transform="rotate(180 115.768 148.419)" {...commonShapeProps} />
-      <rect x="88.3794" y="148.419" width="27.3539" height="120.734" rx="13.6769" transform="rotate(180 88.3794 148.419)" {...commonShapeProps} />
-      <rect x="28.0459" y="115.441" width="27.3539" height="120.734" rx="13.6769" transform="rotate(-90 28.0459 115.441)" {...commonShapeProps} />
-      <rect x="28.0459" y="88.0522" width="27.3539" height="120.734" rx="13.6769" transform="rotate(-90 28.0459 88.0522)" {...commonShapeProps} />
+  'אשה טראנסית': ({ fill }) => (
+    <g transform="translate(-52.5, -52) scale(0.6)" fill={fill}>
+      <rect x="115.768" y="148.419" width="27.3539" height="120.734" rx="13.6769" transform="rotate(180 115.768 148.419)" {...commonCenterShapeProps} />
+      <rect x="88.3794" y="148.419" width="27.3539" height="120.734" rx="13.6769" transform="rotate(180 88.3794 148.419)" {...commonCenterShapeProps} />
+      <rect x="28.0459" y="115.441" width="27.3539" height="120.734" rx="13.6769" transform="rotate(-90 28.0459 115.441)" {...commonCenterShapeProps} />
+      <rect x="28.0459" y="88.0522" width="27.3539" height="120.734" rx="13.6769" transform="rotate(-90 28.0459 88.0522)" {...commonCenterShapeProps} />
     </g>
   ),
-
-  // A perfectly centered circle.
-  'ללא הגדרה': () => (
-    <g>
-      <circle cx="0" cy="0" r="33" {...commonShapeProps} />
+  'ללא הגדרה': ({ fill }) => (
+    <g fill={fill}>
+      <circle cx="0" cy="0" r="33" {...commonCenterShapeProps} />
     </g>
   ),
 };

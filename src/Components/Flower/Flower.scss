@@ -67,12 +67,11 @@
     color: $text-color;
   }
 
-  // Set the specific font sizes for the two lines of text
   .MuiTypography-caption {
-    font-size: 1rem !important; // Slightly smaller for the label
+    font-size: 1rem !important;
     opacity: 0.8;
   }
   .MuiTypography-body2 {
-    font-size: 1rem !important; // The large font size for the value
+    font-size: 1rem !important;
   }
 }

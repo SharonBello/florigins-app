@@ -233,13 +233,14 @@ export const Flower = ({ answers, viewBox }: { answers: Answers, viewBox: string
           <g className="center-layer" transform="translate(100, 100) scale(0.8)" filter="url(#drop-shadow)">
             {CenterShapeComponent && (
               <g className="center-enter">
-                <CenterShapeComponent />
+                {/* The fill color is passed dynamically */}
+                <CenterShapeComponent fill={childhoodAccentGradient ? 'url(#childhood-gradient)' : '#fff'} />
               </g>
             )}
           </g>
 
           {/* --- ACCENT LAYERS (No Shadow) --- */}
-          <g className="accent-layer" fill="none" stroke="#333" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round">
+          < g className="accent-layer" fill="none" stroke="#333" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" >
 
             {/* Sexual Orientation Accents - On tips of outer petals */}
             {OrientationAccentComponent && topAndBottomInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
@@ -282,11 +283,8 @@ export const Flower = ({ answers, viewBox }: { answers: Answers, viewBox: string
             ))}
 
             {/* Childhood Accents - Inside inner petals */}
-            {ChildhoodComponent && innerPetals.map((p): JSX.Element => (
-              <g
-                key={`c-${p.key}`}
-                transform={`translate(100,100) rotate(${p.rotation}) translate(0,-68)`}
-              >
+            {ChildhoodComponent && innerPetals.map((p: { key: any; rotation: any; }): JSX.Element => (
+              <g key={`c-${p.key}`} transform={`translate(100,100) rotate(${p.rotation}) translate(0,-68)`} >
                 <g transform="scale(0.6)">
                   {/* use the new gradient or fall back to white */}
                   <ChildhoodComponent

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type JSX } from 'react';
+import { useRef, useState, type JSX } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { flowerDefinitions, questions } from "../../data/appData";
 import type { Answers } from "../../types/Answers";
@@ -12,7 +12,6 @@ import React from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-
 const PrintableFlower = React.forwardRef<HTMLDivElement, { answers: Answers; summary: string }>((
     { answers, summary }, ref) => (
     <div className="print-layout" ref={ref}>
@@ -21,7 +20,7 @@ const PrintableFlower = React.forwardRef<HTMLDivElement, { answers: Answers; sum
             <Typography dir="ltr">Florigins</Typography>
         </header>
         <div className="print-flower-container">
-            <Flower answers={answers} viewBox = "-95 -95 390 390"/>
+            <Flower answers={answers} viewBox="-25 -25 250 250" />
         </div>
         <footer className="print-footer">
             <Typography className="summary-text">{summary}</Typography>
@@ -35,7 +34,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
     const printComponentRef = useRef<HTMLDivElement>(null);
 
     const allQuestionsAnswered = React.useMemo(() => {
-        const requiredQuestions = questions.filter(q => q.id !== 'name');
+        const requiredQuestions = questions.filter(q => q.id !== 'name' && q.id !== 'belonging');
         return requiredQuestions.every(question => {
             const answer = answers[question.id];
             if (typeof answer === 'number') return true;
@@ -76,11 +75,10 @@ export const FormScreen: React.FC = (): JSX.Element => {
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pdfHeight = pdf.internal.pageSize.getHeight();
 
-            pdf.setFillColor('#F8F5F2');
+            pdf.setFillColor('#F7F0E6');
             pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
 
             const canvasAspectRatio = canvas.width / canvas.height;
-            const pageAspectRatio = pdfWidth / pdfHeight;
 
             let finalImgWidth, finalImgHeight;
             const margin = 10;
@@ -100,22 +98,18 @@ export const FormScreen: React.FC = (): JSX.Element => {
 
             pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
 
-            // 2. Generate the PDF as a Blob and create an Object URL.
             const pdfBlob = pdf.output('blob');
             const pdfUrl = URL.createObjectURL(pdfBlob);
 
-            // 3. Update the location of the already-opened window.
             newWindow.location.href = pdfUrl;
             newWindow.document.title = (answers.name as string) || 'Florigins';
 
-            // Clean up the object URL after a short delay
             setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
 
-            // Navigate to the results page in the original tab after the PDF is handled.
             navigate('/results', { state: { answers } });
         }).catch(err => {
             console.error("Error generating PDF:", err);
-            newWindow.document.write('<h1>Sorry, something went wrong.</h1><p>Could not generate the PDF.</p>');
+            if (newWindow) newWindow.close();
         });
     };
 
@@ -191,7 +185,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                         align-items: center;
                         padding: 3rem;
                         box-sizing: border-box;
-                        background-color: #F8F5F2;
+                        background-color: #F7F0E6;
                     }
                      .print-header {
                        width: 100%;
@@ -239,14 +233,14 @@ export const FormScreen: React.FC = (): JSX.Element => {
 
             <div className="form-panel">
                 <section className="form-header">
-                    <button onClick={handleBack} className="back-button">
+                    <div onClick={handleBack} className="back-button">
                         <article className="back-icon-container">
                             <span>חזרה</span>
                             <IconButton className="back-icon-button" size="small" aria-label="back">
                                 <ArrowBackIcon />
                             </IconButton>
                         </article>
-                    </button>
+                    </div>
                 </section>
                 <hr className="section-divider" />
 
@@ -300,7 +294,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     {['childhoodEnvironment'].map((id) => {
                         const question = findQuestion(id);
                         return (
-                            <div className="form-childhoodEnvironment-section">
+                            <div key={id} className="form-childhoodEnvironment-section">
                                 <h3 className="section-title">{question.label}</h3>
                                 <FormStep question={findQuestion('childhoodEnvironment')} value={answers['childhoodEnvironment']} onChange={(v) => handleAnswerChange('childhoodEnvironment', v)} showLabel={false} />
                             </div>
@@ -312,7 +306,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     {['sexualOrientation'].map((id) => {
                         const question = findQuestion(id);
                         return (
-                            <div className="form-sexualOrientation-section">
+                            <div key={id} className="form-sexualOrientation-section">
                                 <h3 className="section-title">{question.label}</h3>
                                 <FormStep question={findQuestion('sexualOrientation')} value={answers['sexualOrientation']} onChange={(v) => handleAnswerChange('sexualOrientation', v)} showLabel={false} />
                             </div>
@@ -324,7 +318,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     {['religion'].map((id) => {
                         const question = findQuestion(id);
                         return (
-                            <div className="form-religion-section">
+                            <div key={id} className="form-religion-section">
                                 <h3 className="section-title">{question.label}</h3>
                                 <FormStep question={findQuestion('religion')} value={answers['religion']} onChange={(v) => handleAnswerChange('religion', v)} showLabel={false} />
                             </div>
@@ -336,7 +330,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     {['politicalView'].map((id) => {
                         const question = findQuestion(id);
                         return (
-                            <div className="form-politicalView-section">
+                            <div key={id} className="form-politicalView-section">
                                 <h3 className="section-title">{question.label}</h3>
                                 <FormStep question={findQuestion('politicalView')} value={answers['politicalView']} onChange={(v) => handleAnswerChange('politicalView', v)} showLabel={false} />
                             </div>
@@ -348,7 +342,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     {['diet'].map((id) => {
                         const question = findQuestion(id);
                         return (
-                            <div className="form-diet-section">
+                            <div key={id} className="form-diet-section">
                                 <h3 className="section-title">{question.label}</h3>
                                 <FormStep question={findQuestion('diet')} value={answers['diet']} onChange={(v) => handleAnswerChange('diet', v)} showLabel={false} />
                             </div>
@@ -379,9 +373,8 @@ export const FormScreen: React.FC = (): JSX.Element => {
                         {answers.name as string}
                     </Typography>
                     <Typography className="app-name" dir="ltr">Florigins</Typography>
-                    {/* <hr className="form-border" /> */}
                 </header>
-                <Flower answers={answers} viewBox="-95 -95 390 390"/>
+                <Flower answers={answers} viewBox="-95 -95 390 390" />
                 <div className="form-footer-container screen-only">
                     <hr className="form-border" />
                 </div>

@@ -6,13 +6,13 @@ body {
     font-family: $main-font;
     font-weight: $font-weight-light;
     font-size: $font-size-desktop;
-    overflow: hidden; // Disable body scroll
-    direction: rtl; // Set the default text direction to right-to-left
+    overflow: hidden;
+    direction: rtl;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    height: 100vh; // Ensure body takes full height
-    width: 100vw; // Ensure body takes full width
+    height: 100vh;
+    width: 100vw;
 }
 
 .app-container {

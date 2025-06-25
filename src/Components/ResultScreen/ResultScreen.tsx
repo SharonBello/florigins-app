@@ -20,48 +20,62 @@ export const ResultScreen = () => {
     };
 
     const handleShare = async (): Promise<void> => {
-        const container = flowerRef.current
-        if (!container) return
-        const svgEl = container.querySelector('svg') as SVGSVGElement | null
-        if (!svgEl) return
+        const container = flowerRef.current;
+        if (!container) return;
+
+        const svgEl = container.querySelector('svg') as SVGSVGElement | null;
+        if (!svgEl) return;
 
         // Serialize SVG → string
-        const serializer = new XMLSerializer()
-        const svgString = serializer.serializeToString(svgEl)
+        const serializer = new XMLSerializer();
+        const svgString = serializer.serializeToString(svgEl);
 
-        // Make a Blob+URL for <img>
-        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
-        const url = URL.createObjectURL(svgBlob)
-        const img = new Image()
+        // Create Blob & Image
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        const img = new Image();
 
         img.onload = async (): Promise<void> => {
-            // 1) get rendered size
-            const rect = svgEl.getBoundingClientRect()
-            const width = rect.width
-            const height = rect.height
+            const rect = svgEl.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+            const headerHeight = 10;
+            const scale = window.devicePixelRatio || 1;
 
-            // 2) choose scale factor (for Retina, etc.)
-            const scale = window.devicePixelRatio || 1
+            const canvas = document.createElement('canvas');
+            canvas.width = width * scale;
+            canvas.height = (height + headerHeight) * scale;
+            canvas.style.width = `${width}px`;
+            canvas.style.height = `${height + headerHeight}px`;
 
-            // 3) setup a higher-res canvas
-            const canvas = document.createElement('canvas')
-            canvas.width = width * scale
-            canvas.height = height * scale
-            // keep CSS size correct
-            canvas.style.width = `${width}px`
-            canvas.style.height = `${height}px`
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
 
-            const ctx = canvas.getContext('2d')
-            if (!ctx) return
+            // Fill background
+            ctx.fillStyle = '#F7F0E6';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 4) scale the drawing context
-            ctx.scale(scale, scale)
-            ctx.drawImage(img, 0, 0, width, height)
+            // Header text
+            ctx.fillStyle = '#000000';
+            ctx.font = `${24 * scale}px Heebo`;
+            ctx.textAlign = 'center';
 
-            // 5) export to PNG
+            // Draw "Florigins" (LTR)
+            ctx.direction = 'ltr';
+            ctx.fillText('Florigins', (width * scale) / 2, 70 * scale);
+
+            // Draw name (RTL)
+            // ctx.direction = 'rtl';
+            // ctx.fillText((answers.name as string) || 'הפרח שלך', (width * scale) / 2, 40 * scale);
+
+            // Draw SVG image below header
+            ctx.scale(scale, scale);
+            ctx.drawImage(img, 0, headerHeight, width, height);
+
+            // Export PNG
             canvas.toBlob(async (blob) => {
-                if (!blob) return
-                const file = new File([blob], 'flower.png', { type: 'image/png' })
+                if (!blob) return;
+                const file = new File([blob], 'flower.png', { type: 'image/png' });
 
                 if (navigator.canShare?.({ files: [file] })) {
                     try {
@@ -69,27 +83,27 @@ export const ResultScreen = () => {
                             files: [file],
                             title: `הפרח של ${answers.name || 'אלמוני'}`,
                             text: 'ראו את הפרח שיצרתי ב-Florigins!',
-                        })
+                        });
                     } catch (err) {
-                        console.error('Share failed:', err)
+                        console.error('Share failed:', err);
                     }
                 } else {
                     // fallback: download
-                    const dlUrl = URL.createObjectURL(blob)
-                    const a = document.createElement('a')
-                    a.href = dlUrl
-                    a.download = 'flower.png'
-                    a.click()
-                    URL.revokeObjectURL(dlUrl)
+                    const dlUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = dlUrl;
+                    a.download = 'flower.png';
+                    a.click();
+                    URL.revokeObjectURL(dlUrl);
                 }
 
-                // cleanup
-                URL.revokeObjectURL(url)
-            }, 'image/png')
-        }
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        };
 
-        img.src = url
-    }
+        img.src = url;
+    };
+
     return (
         <>
             <div className="result-screen-container">
