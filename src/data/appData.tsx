@@ -493,27 +493,27 @@ export const dietAccents: Record<string, (props: { fill: string }) => JSX.Elemen
 // Dots inside inner petals, based on Childhood Environment
 export const childhoodEnvironmentAccents: Record<string, (props: { fill: string }) => JSX.Element> = {
   'עיר': ({ fill }: { fill: string }) => ( // City - Uses the shape you provided
-    <g transform="translate(-6, 55)" fill={fill}>
+    <g transform="translate(-6, 40)" fill={fill}>
       <rect x="8.4" y="3.04" width="3.73" height="11.8" rx="1.86" transform="rotate(180 8.4 3.04)" fill={fill} strokeWidth="0" />
       <circle cx="19" cy="-5" r="1.74" transform="rotate(-180 12.78 1.84)" fill={fill} strokeWidth="0" />
     </g>
   ),
   'מושב': ({ fill }: { fill: string }) => (  // Moshav - Two vertical dots
-    <g transform="translate(-14, 55) rotate(-45)" fill={fill}>
+    <g transform="translate(-14, 40) rotate(-45)" fill={fill}>
       <rect x="8.98169" y="11.8398" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-135 8.98169 11.8398)" fill={fill} strokeWidth="0" />
       <rect x="2.30566" y="3.42432" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-15 2.30566 3.42432)" fill={fill} strokeWidth="0" />
       <rect width="1.89025" height="5.9858" rx="0.945127" transform="matrix(0.258819 -0.965926 -0.965926 -0.258819 16.0586 17.1769)" fill={fill} strokeWidth="0" />
     </g>
   ),
   'קיבוץ': ({ fill }: { fill: string }) => (  // Kibbutz - Three dots in a triangle
-    <g transform="translate(-8, 55) rotate(-45)" fill={fill}>
+    <g transform="translate(-8, 40) rotate(-45)" fill={fill}>
       <circle cx="8.43894" cy="10.6223" r="1.24384" transform="rotate(135 8.43894 10.6223)" fill={fill} strokeWidth="0" />
       <circle cx="2.28196" cy="4.46539" r="1.24384" transform="rotate(135 2.28196 4.46539)" fill={fill} strokeWidth="0" />
       <rect x="7.30078" y="6.33929" width="1.89025" height="5.9858" rx="0.945127" transform="rotate(-135 7.30078 6.33929)" fill={fill} strokeWidth="0" />
     </g>
   ),
   'אחר': ({ fill }: { fill: string }) => (  // Other - A single larger dot
-    <g transform="translate(0, 55)" fill={fill}>
+    <g transform="translate(0, 45)" fill={fill}>
       <circle cx="0" cy="0" r="2.5" fill={fill} strokeWidth="0" />
     </g>
   ),
