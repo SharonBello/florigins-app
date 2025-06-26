@@ -1,6 +1,5 @@
 import { useMemo, useState, type JSX } from 'react';
 import './Flower.scss';
-import type { Answers } from '../../types/Answers';
 import { centerShapes, childhoodEnvironmentAccents, continentCombinationGradients, dietAccents, flowerDefinitions, petalShapes, politicalViewAccents, questions, religionAccents, sexualOrientationAccents } from '../../data/appData';
 import type { Question } from '../../types/Question';
 import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';

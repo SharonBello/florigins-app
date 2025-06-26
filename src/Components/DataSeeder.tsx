@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { db } from '../../firebase'; // Make sure this path is correct
 import { collection, addDoc } from "firebase/firestore";
 import { Button } from '@mui/material';
