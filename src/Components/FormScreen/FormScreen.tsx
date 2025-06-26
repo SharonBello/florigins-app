@@ -45,20 +45,16 @@ export const FormScreen: React.FC = (): JSX.Element => {
         });
     }, [answers]);
 
-    // --- NEW: Robust PDF export handler ---
     const handleExportPdf = async () => {
         if (!allQuestionsAnswered || !printComponentRef.current) return;
         
-        // --- 1. Save the flower data to Firestore ---
         try {
             const docRef = await addDoc(collection(db, "submittedFlowers"), answers);
-            console.log("Flower saved with ID: ", docRef.id);
+            console.info("Flower saved with ID: ", docRef.id);
         } catch (e) {
             console.error("Error adding document: ", e);
-            // Optionally, show an error message to the user
         }
 
-        // --- 2. Generate the PDF and open it ---
         const newWindow = window.open("", "_blank");
         if (!newWindow) {
             alert('Popup blocked! Please allow popups for this site to view the PDF.');
@@ -101,6 +97,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                 newWindow.document.title = (answers.name as string) || 'Florigins';
 
                 setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+                navigate('/results')
             })
             .catch(err => {
                 console.error("Error generating PDF:", err);
