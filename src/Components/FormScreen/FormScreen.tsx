@@ -11,6 +11,8 @@ import type { Question } from '../../types/Question';
 import React from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { db } from '../../../firebase';
+import { collection, addDoc } from "firebase/firestore";
 
 const PrintableFlower = React.forwardRef<HTMLDivElement, { answers: Answers; summary: string }>((
     { answers, summary }, ref) => (
@@ -44,73 +46,66 @@ export const FormScreen: React.FC = (): JSX.Element => {
     }, [answers]);
 
     // --- NEW: Robust PDF export handler ---
-    const handleExportPdf = () => {
-        if (!allQuestionsAnswered || !printComponentRef.current) {
-            console.error("Cannot export, either form is incomplete or ref is not available.");
-            return;
+    const handleExportPdf = async () => {
+        if (!allQuestionsAnswered || !printComponentRef.current) return;
+        
+        // --- 1. Save the flower data to Firestore ---
+        try {
+            const docRef = await addDoc(collection(db, "submittedFlowers"), answers);
+            console.log("Flower saved with ID: ", docRef.id);
+        } catch (e) {
+            console.error("Error adding document: ", e);
+            // Optionally, show an error message to the user
         }
 
-        // 1. Open the new window immediately on click. This helps avoid popup blockers.
-        const newWindow = window.open();
+        // --- 2. Generate the PDF and open it ---
+        const newWindow = window.open("", "_blank");
         if (!newWindow) {
             alert('Popup blocked! Please allow popups for this site to view the PDF.');
             return;
         }
-        newWindow.document.write('<h1>Generating your flower PDF...</h1><p>Please wait a moment.</p>');
-        newWindow.document.title = 'Generating...';
+        newWindow.document.write('<h1>Generating your flower PDF...</h1>');
 
-        html2canvas(printComponentRef.current, {
-            scale: 3,
-            useCORS: true,
-            backgroundColor: null,
-        }).then((canvas) => {
-            const imgData = canvas.toDataURL('image/png');
+        html2canvas(printComponentRef.current, { scale: 3, useCORS: true, backgroundColor: null })
+            .then((canvas) => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                pdf.setFillColor('#F7F0E6');
+                pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
+                
+                const canvasAspectRatio = canvas.width / canvas.height;
+                let finalImgWidth, finalImgHeight;
+                const margin = 15;
+                const printableWidth = pdfWidth - (margin * 2);
+                const printableHeight = pdfHeight - (margin * 2);
 
-            const pdf = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4'
+                if (canvasAspectRatio > (printableWidth / printableHeight)) {
+                    finalImgWidth = printableWidth;
+                    finalImgHeight = printableWidth / canvasAspectRatio;
+                } else {
+                    finalImgHeight = printableHeight;
+                    finalImgWidth = printableHeight * canvasAspectRatio;
+                }
+
+                const x = (pdfWidth - finalImgWidth) / 2;
+                const y = (pdfHeight - finalImgHeight) / 2;
+                
+                pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
+                
+                const pdfBlob = pdf.output('blob');
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+
+                newWindow.location.href = pdfUrl;
+                newWindow.document.title = (answers.name as string) || 'Florigins';
+
+                setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
+            })
+            .catch(err => {
+                console.error("Error generating PDF:", err);
+                if(newWindow) newWindow.close();
             });
-
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
-
-            pdf.setFillColor('#F7F0E6');
-            pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
-
-            const canvasAspectRatio = canvas.width / canvas.height;
-
-            let finalImgWidth, finalImgHeight;
-            const margin = 10;
-            const printableWidth = pdfWidth - (margin * 2);
-            const printableHeight = pdfHeight - (margin * 2);
-
-            if (canvasAspectRatio > (printableWidth / printableHeight)) {
-                finalImgWidth = printableWidth;
-                finalImgHeight = printableWidth / canvasAspectRatio;
-            } else {
-                finalImgHeight = printableHeight;
-                finalImgWidth = printableHeight * canvasAspectRatio;
-            }
-
-            const x = (pdfWidth - finalImgWidth) / 2;
-            const y = (pdfHeight - finalImgHeight) / 2;
-
-            pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
-
-            const pdfBlob = pdf.output('blob');
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-
-            newWindow.location.href = pdfUrl;
-            newWindow.document.title = (answers.name as string) || 'Florigins';
-
-            setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
-
-            navigate('/results', { state: { answers } });
-        }).catch(err => {
-            console.error("Error generating PDF:", err);
-            if (newWindow) newWindow.close();
-        });
     };
 
     const handleBack = () => {
