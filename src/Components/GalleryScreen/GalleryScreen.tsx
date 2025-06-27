@@ -2,61 +2,16 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Flower } from '../Flower/Flower';
 import type { Answers } from '../../types/Answers';
-import { flowerDefinitions, questions } from '../../data/appData';
+import { questions } from '../../data/appData';
 import { Button, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import './GalleryScreen.scss';
 import { db } from '../../../firebase';
 import { collection, onSnapshot } from "firebase/firestore";
 
-// --- MOCK DATA (for testing without a database) ---
-// const mockFlowers: Answers[] = [
-//     {
-//         id: 'mock-sharon-1', // FIX: Added unique ID for testing
-//         name: 'sharon',
-//         genderIdentity: 'אשה',
-//         origin_p1_grandpa: 'North Macedonia',
-//         origin_p1_grandma: 'Bulgaria',
-//         origin_p2_grandpa: 'Ukraine',
-//         origin_p2_grandma: 'Brazil',
-//         belonging: 1,
-//         countryToLive: 'Solomon Islands',
-//         languageToSpeak: 'San Marino',
-//         favoriteCuisine: 'Israel',
-//         cultureToBelong: 'United States',
-//         childhoodEnvironment: 'עיר',
-//         sexualOrientation: 'הטרוסקסואל',
-//         religion: 'יהודי',
-//         politicalView: 'מרכז',
-//         diet: 'אוכל הכל'
-//     },
-//     {
-//         id: 'mock-ofir-2', // FIX: Added unique ID for testing
-//         name: 'אופיר',
-//         genderIdentity: 'גבר',
-//         origin_p1_grandpa: 'Austria',
-//         origin_p1_grandma: 'Angola',
-//         origin_p2_grandpa: 'Botswana',
-//         origin_p2_grandma: 'United Kingdom',
-//         belonging: -1,
-//         countryToLive: 'Austria',
-//         languageToSpeak: 'Malta',
-//         favoriteCuisine: 'Trinidad and Tobago',
-//         cultureToBelong: 'Mauritius',
-//         childhoodEnvironment: 'מושב',
-//         sexualOrientation: 'פאנסקסואל',
-//         religion: 'מוסלמי',
-//         politicalView: 'שמאל מרכז',
-//         diet: 'טבעוני'
-//     },
-// ];
-
 const groupableQuestionIDs = [
     'genderIdentity', 'origin', 'belonging', 'sexualOrientation', 'religion', 'politicalView', 'diet', 'childhoodEnvironment', 'countryToLive', 'languageToSpeak', 'favoriteCuisine', 'cultureToBelong'
 ];
-// const groupableQuestionIDs = [
-//     'genderIdentity', 'origin', 'sexualOrientation', 'religion', 'politicalView', 'diet', 'childhoodEnvironment'
-// ];
 
 export const GalleryScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -72,29 +27,20 @@ export const GalleryScreen: React.FC = () => {
                 flowersFromDb.push({ ...doc.data(), id: doc.id } as Answers);
             });
 
-            // --- THIS IS THE FIX ---
-            // Create a Map to store flowers, ensuring each one is unique based on its content.
             const uniqueFlowersMap = new Map<string, Answers>();
 
             flowersFromDb.forEach(flower => {
-                // We create a "signature" of the flower's data, ignoring the unique ID.
                 const flowerDataForSignature = { ...flower };
-                delete (flowerDataForSignature as any).id; // Temporarily remove ID for comparison.
+                delete (flowerDataForSignature as any).id;
 
                 const signature = JSON.stringify(flowerDataForSignature);
 
-                // If we have not seen this signature before, add the flower to our map.
                 if (!uniqueFlowersMap.has(signature)) {
                     uniqueFlowersMap.set(signature, flower);
                 }
             });
 
-            // Get the unique flowers from the map.
             const uniqueFlowers = Array.from(uniqueFlowersMap.values());
-
-            // --- END OF FIX ---
-
-            // Set the state with the de-duplicated array.
             setAllFlowers(uniqueFlowers);
         });
 
@@ -106,10 +52,7 @@ export const GalleryScreen: React.FC = () => {
 
         if (groupByKey === 'origin') {
             allFlowers.forEach(flower => {
-                // Use a Set to get a unique list of a flower's origins
                 const uniqueOrigins = new Set<string>();
-
-                // This new check ensures the value is a non-empty string before adding it.
                 if (typeof flower.origin_p1_grandpa === 'string' && flower.origin_p1_grandpa.trim() !== '') {
                     uniqueOrigins.add(flower.origin_p1_grandpa);
                 }
@@ -123,21 +66,18 @@ export const GalleryScreen: React.FC = () => {
                     uniqueOrigins.add(flower.origin_p2_grandma);
                 }
                 if (uniqueOrigins.size === 0) {
-                    // If there are no origins, place it in a default group
                     if (!groups["לא ידוע"]) groups["לא ידוע"] = [];
                     groups["לא ידוע"].push(flower);
                 } else {
-                    // Add the ORIGINAL, UNMODIFIED flower to each group it belongs to
                     uniqueOrigins.forEach(originCountry => {
                         if (!groups[originCountry]) {
                             groups[originCountry] = [];
                         }
-                        groups[originCountry].push(flower); // Push the real flower
+                        groups[originCountry].push(flower);
                     });
                 }
             });
         } else {
-            // --- STANDARD LOGIC FOR ALL OTHER FILTERS ---
             allFlowers.forEach(flower => {
                 const groupValue = (flower[groupByKey] as string) || "ללא הגדרה";
                 if (!groups[groupValue]) {
@@ -174,7 +114,7 @@ export const GalleryScreen: React.FC = () => {
                                 {flowersInGroup.map((flowerAnswers: Answers, index: number) => {
                                     return (
                                         <div
-                                            key={`${flowerAnswers.id || index}-${groupName}`} // FIX: Use a more robust key
+                                            key={`${flowerAnswers.id || index}-${groupName}`}
                                             className={`gallery-item`}
                                             style={{
                                                 transform: `translateY(${index % 2 === 0 ? '-20px' : '10px'})`,

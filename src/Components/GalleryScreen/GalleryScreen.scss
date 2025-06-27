@@ -217,7 +217,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  // padding-left: 50px; // Add some padding to not get cut off
+  justify-content: center;
 }
 
 .gallery-item {
@@ -231,14 +231,13 @@
     z-index 0s 0.3s;
   transform-origin: center bottom;
 
-  // The key to the overlap effect
   &:not(:first-child) {
-    margin-right: -160px; // Pull items to the left to overlap
+    margin-right: -160px;
   }
 
   &:hover {
     transform: scale(1.1) translateY(-15px);
-    z-index: 10; // Bring the hovered item to the front
+    z-index: 10;
     transition:
       transform 0.3s ease-out,
       z-index 0s 0s;
@@ -250,7 +249,6 @@
   height: 100%;
 }
 
-// This hides the name text below the flower in the gallery
 .gallery-item-name {
   display: none;
 }

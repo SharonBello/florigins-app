@@ -74,7 +74,6 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
 
     const ShapeComponent = petalShapes[def.continent] || petalShapes.default;
 
-    // return { key, rotation: layoutInfo.rotation, gradientId: `g-${answers.id}-${key}`, gradientStops: def.gradientStops, ShapeComponent };
     return { key, rotation: layoutInfo.rotation, gradientId: `g-${uniqueId}-${key}`, gradientStops: def.gradientStops, ShapeComponent };
 
   })
@@ -154,7 +153,6 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
 
   return (
     <div className="flower-container">
-      {/* Adjusted viewBox for better centering */}
       <svg viewBox={viewBox} preserveAspectRatio="xMidYMid meet">
         <defs>
           {allPetals.map(p => (
@@ -231,7 +229,6 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
           <g className="center-layer" transform="translate(100, 100) scale(0.8)" filter={`url(#drop-shadow-${uniqueId})`}>
             {CenterShapeComponent && (
               <g className="center-enter">
-                {/* FIX: Reference the unique childhood gradient ID */}
                 <CenterShapeComponent fill={childhoodAccentGradient ? `url(#childhood-gradient-${uniqueId})` : '#fff'} />
               </g>
             )}
@@ -279,7 +276,6 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
             {ChildhoodComponent && innerPetals.map((p: { key: any; rotation: any; }): JSX.Element => (
               <g key={`c-${p.key}-${p.rotation}`} transform={`translate(100,100) rotate(${p.rotation}) translate(0,-68)`} >
                 <g transform="scale(0.6)">
-                  {/* FIX: Reference the unique childhood gradient ID */}
                   <ChildhoodComponent
                     fill={childhoodAccentGradient ? `url(#childhood-gradient-${uniqueId})` : '#fff'}
                   />
