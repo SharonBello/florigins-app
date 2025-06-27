@@ -559,26 +559,24 @@
 .print-flower-container {
   flex-grow: 1;
   width: 100%;
-  min-height: 500px;
+  min-height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* line under the flower */
   border-bottom: 1px solid #ccc;
   padding-bottom: 1rem;
 
   svg {
-    width: 100%;
+    width: 80%;
     height: auto;
-    // max-width: 95%;
+    transform: scale(1.3);
+    transform-origin: center;
   }
 }
 
 .print-footer {
   width: 100%;
   padding-top: 0.5rem;
-  /* you can remove the footer border if you like since the flower has its own line */
   border-top: none;
   text-align: center;
 }

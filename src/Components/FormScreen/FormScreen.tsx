@@ -28,7 +28,7 @@ const PrintableFlower = forwardRef<HTMLDivElement, PrintableFlowerProps>(
                 <Typography dir="ltr">Florigins</Typography>
             </header>
             <div className="print-flower-container">
-                <Flower answers={answers} viewBox="-10 -10 200 200" />
+                <Flower answers={answers} viewBox="-50 -50 360 360" />
             </div>
             <footer className="print-footer">
                 <Typography className="summary-text">{summary}</Typography>
