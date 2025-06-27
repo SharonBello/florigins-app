@@ -212,6 +212,7 @@
     }
   }
 }
+
 .gallery-bunch-container {
   display: flex;
   flex-wrap: wrap;
@@ -232,7 +233,7 @@
 
   // The key to the overlap effect
   &:not(:first-child) {
-    margin-right: -165px; // Pull items to the left to overlap
+    margin-right: -160px; // Pull items to the left to overlap
   }
 
   &:hover {

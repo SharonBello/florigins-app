@@ -62,6 +62,7 @@ const tooltipLabels: Record<string, string> = {
 
 export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) => {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+  console.log('Flower', answers)
 
   const allPetals = Object.keys(answers).map((key): PetalInfo | null => {
     const countryName = answers[key] as string;
@@ -168,7 +169,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
             >
               {childhoodAccentGradient.map((color, i) => (
                 <stop
-                  key={i}
+                  key={`${i}-${color}`}
                   offset={`${(i / (childhoodAccentGradient.length - 1)) * 100}%`}
                   stopColor={color}
                 />
@@ -190,8 +191,10 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
               const radialOffset = isBasePetal ? -48 : -42;
 
               const { placement, offset } = getTooltipConfig(pd.rotation);
+              const key = `${pd.key}-${pd.rotation}`;
               const petalNode = (
                 <g
+                  key={key}
                   className="petal-group"
                   transform={`translate(100, 100) rotate(${pd.rotation}) translate(0, ${radialOffset})`}
                   onMouseEnter={() => setHoveredKey(pd.key)}
@@ -220,7 +223,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
               ) : (
                 petalNode
               );
-            })};  
+            })};
           </g>
 
           <g className="center-layer" transform="translate(100, 100) scale(0.8)" filter="url(#drop-shadow)">
@@ -237,7 +240,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
 
             {/* Sexual Orientation Accents - On tips of outer petals */}
             {OrientationAccentComponent && topAndBottomInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
-              <g key={`so-${petal.key}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(25, -68)`}>
+              <g key={`so-${petal.key}-${petal.rotation}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(25, -68)`}>
                 <OrientationAccentComponent fill={`url(#${petal.gradientId})`} />
               </g>
             ))}
@@ -259,7 +262,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
             )}
 
             {DietAccentComponent && leftAndRightInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
-              <g key={`r-${petal.key}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(0, -35)`}>
+              <g key={`r-${petal.key}-${petal.rotation}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(0, -35)`}>
                 <g transform="scale(0.8)">
                   <DietAccentComponent fill={`url(#${petal.gradientId})`} />
                 </g>
@@ -268,7 +271,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
 
             {/* Religion Accents - Between inner and outer petals */}
             {ReligionAccentElement && leftAndRightInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
-              <g key={`r-${petal.key}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(0, -35)`}>
+              <g key={`r-${petal.key}-${petal.rotation}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(0, -35)`}>
                 <g transform="scale(0.8)">
                   <ReligionAccentElement fill={`url(#${petal.gradientId})`} />
                 </g>
@@ -277,7 +280,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
 
             {/* Childhood Accents - Inside inner petals */}
             {ChildhoodComponent && innerPetals.map((p: { key: any; rotation: any; }): JSX.Element => (
-              <g key={`c-${p.key}`} transform={`translate(100,100) rotate(${p.rotation}) translate(0,-68)`} >
+              <g key={`c-${p.key}-${p.rotation}`} transform={`translate(100,100) rotate(${p.rotation}) translate(0,-68)`} >
                 <g transform="scale(0.6)">
                   {/* use the new gradient or fall back to white */}
                   <ChildhoodComponent
@@ -289,6 +292,6 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
           </g>
         </g>
       </svg>
-    </div>
+    </div >
   );
 };
