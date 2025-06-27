@@ -1,1 +1,1 @@
-export type Answers = Record<string, unknown>;
+export type Answers = { id?: string } & Record<string, unknown>;

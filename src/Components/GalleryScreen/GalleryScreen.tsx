@@ -10,160 +10,46 @@ import { db } from '../../../firebase';
 import { collection, onSnapshot } from "firebase/firestore";
 
 // --- MOCK DATA (for testing without a database) ---
-const mockFlowers: Answers[] = [
-    // 0: יעל (Philippines/Ukraine)
-    // {
-    //     name: 'יעל',
-    //     genderIdentity: 'אשה',
-    //     origin_p1_grandpa: 'Philippines',
-    //     origin_p1_grandma: 'Philippines',
-    //     origin_p2_grandpa: 'Ukraine',
-    //     origin_p2_grandma: 'Poland',
-    //     belonging: -1,
-    //     countryToLive: 'United States',
-    //     languageToSpeak: 'Switzerland',
-    //     favoriteCuisine: 'Japan',
-    //     cultureToBelong: 'United States',
-    //     childhoodEnvironment: 'עיר',
-    //     sexualOrientation: 'ביסקסואל',
-    //     religion: 'יהודי',
-    //     politicalView: 'שמאל מרכז',
-    //     diet: 'אוכל הכל'
-    // },
-    // 1: יעל (Armenia/USA)
-    // {
-    //     name: 'יעל',
-    //     genderIdentity: 'אשה',
-    //     origin_p1_grandpa: 'Armenia',
-    //     origin_p1_grandma: 'Bosnia and Herzegovina',
-    //     origin_p2_grandpa: 'United States',
-    //     origin_p2_grandma: 'South Korea',
-    //     belonging: -1,
-    //     countryToLive: 'Austria',
-    //     languageToSpeak: 'Iceland',
-    //     favoriteCuisine: 'Uganda',
-    //     cultureToBelong: 'Ecuador',
-    //     childhoodEnvironment: 'עיר',
-    //     sexualOrientation: 'הטרוסקסואל',
-    //     religion: 'נוצרי',
-    //     politicalView: 'שמאל מרכז',
-    //     diet: 'טבעוני'
-    // },
-    // 2: קירן
-    // {
-    //     name: 'קירן',
-    //     genderIdentity: 'גבר',
-    //     origin_p1_grandpa: 'Bulgaria',
-    //     origin_p1_grandma: 'Brazil',
-    //     origin_p2_grandpa: 'Israel',
-    //     origin_p2_grandma: 'Israel',
-    //     belonging: 0, // Assuming 0 for 'no preference'
-    //     countryToLive: 'Israel',
-    //     languageToSpeak: 'Israel',
-    //     favoriteCuisine: 'Israel',
-    //     cultureToBelong: 'Israel',
-    //     childhoodEnvironment: 'מושב',
-    //     sexualOrientation: 'הטרוסקסואל',
-    //     religion: 'יהודי',
-    //     politicalView: 'מרכז',
-    //     diet: 'אוכל הכל'
-    // },
-    // // 3: דורית
-    // {
-    //     name: 'דורית',
-    //     genderIdentity: 'אשה',
-    //     origin_p1_grandpa: 'Iran',
-    //     origin_p1_grandma: 'Iran',
-    //     origin_p2_grandpa: 'Iran',
-    //     origin_p2_grandma: 'Iran',
-    //     belonging: 1,
-    //     countryToLive: 'Israel',
-    //     languageToSpeak: 'San Marino',
-    //     favoriteCuisine: 'Libya',
-    //     cultureToBelong: 'Israel',
-    //     childhoodEnvironment: 'עיר',
-    //     sexualOrientation: 'הטרוסקסואל',
-    //     religion: 'יהודי',
-    //     politicalView: 'ימין',
-    //     diet: 'אוכל כשרות'
-    // },
-    // 4: sharon
-    {
-        name: 'sharon',
-        genderIdentity: 'אשה',
-        origin_p1_grandpa: 'North Macedonia',
-        origin_p1_grandma: 'Bulgaria',
-        origin_p2_grandpa: 'Ukraine',
-        origin_p2_grandma: 'Brazil',
-        belonging: 1,
-        countryToLive: 'Solomon Islands',
-        languageToSpeak: 'San Marino',
-        favoriteCuisine: 'Israel',
-        cultureToBelong: 'United States',
-        childhoodEnvironment: 'עיר',
-        sexualOrientation: 'הטרוסקסואל',
-        religion: 'יהודי',
-        politicalView: 'מרכז',
-        diet: 'אוכל הכל'
-    },
-    // 5: אופיר
-    {
-        name: 'אופיר',
-        genderIdentity: 'גבר',
-        origin_p1_grandpa: 'Austria',
-        origin_p1_grandma: 'Angola',
-        origin_p2_grandpa: 'Botswana',
-        origin_p2_grandma: 'United Kingdom',
-        belonging: -1,
-        countryToLive: 'Austria',
-        languageToSpeak: 'Malta',
-        favoriteCuisine: 'Trinidad and Tobago',
-        cultureToBelong: 'Mauritius',
-        childhoodEnvironment: 'מושב',
-        sexualOrientation: 'פאנסקסואל',
-        religion: 'מוסלמי',
-        politicalView: 'שמאל מרכז',
-        diet: 'טבעוני'
-    },
-    // 6: מרליי
-    // {
-    //     name: 'מרליי',
-    //     genderIdentity: 'אשה',
-    //     origin_p1_grandpa: 'Poland',
-    //     origin_p1_grandma: 'Poland',
-    //     origin_p2_grandpa: 'Moldova',
-    //     origin_p2_grandma: 'Moldova',
-    //     belonging: -1,
-    //     countryToLive: 'Israel',
-    //     languageToSpeak: 'Yemen',
-    //     favoriteCuisine: 'China',
-    //     cultureToBelong: 'Israel',
-    //     childhoodEnvironment: 'מושב',
-    //     sexualOrientation: 'הטרוסקסואל',
-    //     religion: 'יהודי',
-    //     politicalView: 'שמאל מרכז',
-    //     diet: 'אוכל הכל'
-    // },
-    // // 7: דליה
-    // {
-    //     name: 'דליה',
-    //     genderIdentity: 'אשה',
-    //     origin_p1_grandpa: 'Yemen',
-    //     origin_p1_grandma: 'Yemen',
-    //     origin_p2_grandpa: 'Yemen',
-    //     origin_p2_grandma: 'Yemen',
-    //     belonging: -1,
-    //     countryToLive: 'Italy',
-    //     languageToSpeak: 'Monaco',
-    //     favoriteCuisine: 'Italy',
-    //     cultureToBelong: 'Israel',
-    //     childhoodEnvironment: 'עיר',
-    //     sexualOrientation: 'הטרוסקסואל',
-    //     religion: 'יהודי',
-    //     politicalView: 'שמאל מרכז',
-    //     diet: 'אוכל הכל'
-    // }
-];
+// const mockFlowers: Answers[] = [
+//     {
+//         id: 'mock-sharon-1', // FIX: Added unique ID for testing
+//         name: 'sharon',
+//         genderIdentity: 'אשה',
+//         origin_p1_grandpa: 'North Macedonia',
+//         origin_p1_grandma: 'Bulgaria',
+//         origin_p2_grandpa: 'Ukraine',
+//         origin_p2_grandma: 'Brazil',
+//         belonging: 1,
+//         countryToLive: 'Solomon Islands',
+//         languageToSpeak: 'San Marino',
+//         favoriteCuisine: 'Israel',
+//         cultureToBelong: 'United States',
+//         childhoodEnvironment: 'עיר',
+//         sexualOrientation: 'הטרוסקסואל',
+//         religion: 'יהודי',
+//         politicalView: 'מרכז',
+//         diet: 'אוכל הכל'
+//     },
+//     {
+//         id: 'mock-ofir-2', // FIX: Added unique ID for testing
+//         name: 'אופיר',
+//         genderIdentity: 'גבר',
+//         origin_p1_grandpa: 'Austria',
+//         origin_p1_grandma: 'Angola',
+//         origin_p2_grandpa: 'Botswana',
+//         origin_p2_grandma: 'United Kingdom',
+//         belonging: -1,
+//         countryToLive: 'Austria',
+//         languageToSpeak: 'Malta',
+//         favoriteCuisine: 'Trinidad and Tobago',
+//         cultureToBelong: 'Mauritius',
+//         childhoodEnvironment: 'מושב',
+//         sexualOrientation: 'פאנסקסואל',
+//         religion: 'מוסלמי',
+//         politicalView: 'שמאל מרכז',
+//         diet: 'טבעוני'
+//     },
+// ];
 
 const groupableQuestionIDs = [
     'genderIdentity', 'origin', 'belonging', 'sexualOrientation', 'religion', 'politicalView', 'diet', 'childhoodEnvironment', 'countryToLive', 'languageToSpeak', 'favoriteCuisine', 'cultureToBelong'
@@ -174,54 +60,51 @@ const groupableQuestionIDs = [
 
 export const GalleryScreen: React.FC = () => {
     const navigate = useNavigate();
-    const [allFlowers, setAllFlowers] = useState<Answers[]>(mockFlowers);
+    const [allFlowers, setAllFlowers] = useState<Answers[]>([]);
     const [groupByKey, setGroupByKey] = useState<keyof Answers>('genderIdentity');
 
-    // useEffect(() => {
-    //     const flowersCollectionRef = collection(db, "submittedFlowers");
+    useEffect(() => {
+        const flowersCollectionRef = collection(db, "submittedFlowers");
 
-    //     const unsubscribe = onSnapshot(flowersCollectionRef, (querySnapshot) => {
-    //         const flowersFromDb: Answers[] = [];
-    //         querySnapshot.forEach((doc) => {
-    //             flowersFromDb.push({ ...doc.data(), id: doc.id } as Answers);
-    //         });
+        const unsubscribe = onSnapshot(flowersCollectionRef, (querySnapshot) => {
+            const flowersFromDb: Answers[] = [];
+            querySnapshot.forEach((doc) => {
+                flowersFromDb.push({ ...doc.data(), id: doc.id } as Answers);
+            });
 
-    //         // --- THIS IS THE FIX ---
-    //         // Create a Map to store flowers, ensuring each one is unique based on its content.
-    //         const uniqueFlowersMap = new Map<string, Answers>();
+            // --- THIS IS THE FIX ---
+            // Create a Map to store flowers, ensuring each one is unique based on its content.
+            const uniqueFlowersMap = new Map<string, Answers>();
 
-    //         flowersFromDb.forEach(flower => {
-    //             // We create a "signature" of the flower's data, ignoring the unique ID.
-    //             const flowerDataForSignature = { ...flower };
-    //             delete (flowerDataForSignature as any).id; // Temporarily remove ID for comparison.
+            flowersFromDb.forEach(flower => {
+                // We create a "signature" of the flower's data, ignoring the unique ID.
+                const flowerDataForSignature = { ...flower };
+                delete (flowerDataForSignature as any).id; // Temporarily remove ID for comparison.
 
-    //             const signature = JSON.stringify(flowerDataForSignature);
+                const signature = JSON.stringify(flowerDataForSignature);
 
-    //             // If we have not seen this signature before, add the flower to our map.
-    //             if (!uniqueFlowersMap.has(signature)) {
-    //                 uniqueFlowersMap.set(signature, flower);
-    //             }
-    //         });
+                // If we have not seen this signature before, add the flower to our map.
+                if (!uniqueFlowersMap.has(signature)) {
+                    uniqueFlowersMap.set(signature, flower);
+                }
+            });
 
-    //         // Get the unique flowers from the map.
-    //         const uniqueFlowers = Array.from(uniqueFlowersMap.values());
+            // Get the unique flowers from the map.
+            const uniqueFlowers = Array.from(uniqueFlowersMap.values());
 
-    //         // --- END OF FIX ---
+            // --- END OF FIX ---
 
-    //         // Set the state with the de-duplicated array.
-    //         setAllFlowers(uniqueFlowers);
-    //     });
+            // Set the state with the de-duplicated array.
+            setAllFlowers(uniqueFlowers);
+        });
 
-    //     return () => unsubscribe();
-    // }, []);
-
-    // In GalleryScreen.tsx
+        return () => unsubscribe();
+    }, []);
 
     const groupedFlowers = useMemo(() => {
         const groups: { [key: string]: Answers[] } = {};
 
         if (groupByKey === 'origin') {
-            // --- FINAL CORRECTED LOGIC FOR 'ORIGIN' FILTER ---
             allFlowers.forEach(flower => {
                 // Use a Set to get a unique list of a flower's origins
                 const uniqueOrigins = new Set<string>();
@@ -291,7 +174,7 @@ export const GalleryScreen: React.FC = () => {
                                 {flowersInGroup.map((flowerAnswers: Answers, index: number) => {
                                     return (
                                         <div
-                                            key={typeof flowerAnswers.id === 'string' || typeof flowerAnswers.id === 'number' ? flowerAnswers.id : `${groupName}-${index}`}
+                                            key={`${flowerAnswers.id || index}-${groupName}`} // FIX: Use a more robust key
                                             className={`gallery-item`}
                                             style={{
                                                 transform: `translateY(${index % 2 === 0 ? '-20px' : '10px'})`,

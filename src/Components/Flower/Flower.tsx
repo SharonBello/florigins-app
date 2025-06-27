@@ -1,5 +1,4 @@
-import { useMemo, useState, type JSX } from 'react';
-import './Flower.scss';
+import { useMemo, useState, type JSX, useId } from 'react';
 import { centerShapes, childhoodEnvironmentAccents, continentCombinationGradients, dietAccents, flowerDefinitions, petalShapes, politicalViewAccents, questions, religionAccents, sexualOrientationAccents } from '../../data/appData';
 import type { Question } from '../../types/Question';
 import Tooltip, { type TooltipProps } from '@mui/material/Tooltip';
@@ -62,7 +61,8 @@ const tooltipLabels: Record<string, string> = {
 
 export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) => {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
-  console.log('Flower', answers)
+
+  const uniqueId = useId();
 
   const allPetals = Object.keys(answers).map((key): PetalInfo | null => {
     const countryName = answers[key] as string;
@@ -74,7 +74,9 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
 
     const ShapeComponent = petalShapes[def.continent] || petalShapes.default;
 
-    return { key, rotation: layoutInfo.rotation, gradientId: `g-${key}`, gradientStops: def.gradientStops, ShapeComponent };
+    // return { key, rotation: layoutInfo.rotation, gradientId: `g-${answers.id}-${key}`, gradientStops: def.gradientStops, ShapeComponent };
+    return { key, rotation: layoutInfo.rotation, gradientId: `g-${uniqueId}-${key}`, gradientStops: def.gradientStops, ShapeComponent };
+
   })
     .filter((p): p is PetalInfo => p !== null);
 
@@ -164,7 +166,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
           ))}
           {childhoodAccentGradient && (
             <linearGradient
-              id="childhood-gradient"
+              id={`childhood-gradient-${uniqueId}`}
               gradientTransform="rotate(90)"
             >
               {childhoodAccentGradient.map((color, i) => (
@@ -177,7 +179,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
             </linearGradient>
           )}
 
-          <filter id="drop-shadow" x="-100%" y="-100%" width="300%" height="300%">
+          <filter id={`drop-shadow-${uniqueId}`} x="-100%" y="-100%" width="300%" height="300%">
             <feDropShadow dx="0.5" dy="1" stdDeviation="1" floodColor="#000000" floodOpacity="0.2" />
           </filter>
         </defs>
@@ -201,7 +203,7 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
                   onMouseLeave={() => setHoveredKey(null)}
                 >
                   <g className={`petal-visuals ${hoveredKey === pd.key ? 'hovered' : ''}`}>
-                    <g transform={`scale(${scale})`} filter="url(#drop-shadow)" fill={`url(#${pd.gradientId})`}>
+                    <g transform={`scale(${scale})`} filter={`url(#drop-shadow-${uniqueId})`} fill={`url(#${pd.gradientId})`}>
                       <pd.ShapeComponent />
                     </g>
                   </g>
@@ -226,26 +228,23 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
             })};
           </g>
 
-          <g className="center-layer" transform="translate(100, 100) scale(0.8)" filter="url(#drop-shadow)">
+          <g className="center-layer" transform="translate(100, 100) scale(0.8)" filter={`url(#drop-shadow-${uniqueId})`}>
             {CenterShapeComponent && (
               <g className="center-enter">
-                {/* The fill color is passed dynamically */}
-                <CenterShapeComponent fill={childhoodAccentGradient ? 'url(#childhood-gradient)' : '#fff'} />
+                {/* FIX: Reference the unique childhood gradient ID */}
+                <CenterShapeComponent fill={childhoodAccentGradient ? `url(#childhood-gradient-${uniqueId})` : '#fff'} />
               </g>
             )}
           </g>
 
           {/* --- ACCENT LAYERS (No Shadow) --- */}
-          < g className="accent-layer" fill="none" stroke="#333" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" >
-
-            {/* Sexual Orientation Accents - On tips of outer petals */}
+          <g className="accent-layer" fill="none" stroke="#333" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" >
             {OrientationAccentComponent && topAndBottomInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
               <g key={`so-${petal.key}-${petal.rotation}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(25, -68)`}>
                 <OrientationAccentComponent fill={`url(#${petal.gradientId})`} />
               </g>
             ))}
 
-            {/* Political View Accents - On sides of horizontal outer petals */}
             {PoliticalAccents && PoliticalAccents.right && rightPetal && (
               <g transform={`translate(100, 100) rotate(90) translate(65, 0) rotate(${PoliticalAccents.rightTilt || 0})`}>
                 <g transform="scale(0.8)">
@@ -269,7 +268,6 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
               </g>
             ))}
 
-            {/* Religion Accents - Between inner and outer petals */}
             {ReligionAccentElement && leftAndRightInnerPetals.map((petal: { key: any; rotation: any; gradientId: any; }) => (
               <g key={`r-${petal.key}-${petal.rotation}`} transform={`translate(100, 100) rotate(${petal.rotation}) translate(0, -35)`}>
                 <g transform="scale(0.8)">
@@ -278,13 +276,12 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
               </g>
             ))}
 
-            {/* Childhood Accents - Inside inner petals */}
             {ChildhoodComponent && innerPetals.map((p: { key: any; rotation: any; }): JSX.Element => (
               <g key={`c-${p.key}-${p.rotation}`} transform={`translate(100,100) rotate(${p.rotation}) translate(0,-68)`} >
                 <g transform="scale(0.6)">
-                  {/* use the new gradient or fall back to white */}
+                  {/* FIX: Reference the unique childhood gradient ID */}
                   <ChildhoodComponent
-                    fill={childhoodAccentGradient ? 'url(#childhood-gradient)' : '#fff'}
+                    fill={childhoodAccentGradient ? `url(#childhood-gradient-${uniqueId})` : '#fff'}
                   />
                 </g>
               </g>

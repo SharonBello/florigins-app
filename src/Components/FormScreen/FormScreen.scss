@@ -47,7 +47,7 @@
     .flower-container {
       flex: 1;
       max-height: 85vh;
-      
+
       @media (min-width: 800px) and (max-width: 1800px) {
         max-height: 80vh;
       }
@@ -542,4 +542,43 @@
       }
     }
   }
+}
+
+.print-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ccc;
+  font-family: "Heebo", sans-serif;
+  letter-spacing: 0.2em;
+  color: #333;
+}
+
+.print-flower-container {
+  flex-grow: 1;
+  width: 100%;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* line under the flower */
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 1rem;
+
+  svg {
+    width: 100%;
+    height: auto;
+    // max-width: 95%;
+  }
+}
+
+.print-footer {
+  width: 100%;
+  padding-top: 0.5rem;
+  /* you can remove the footer border if you like since the flower has its own line */
+  border-top: none;
+  text-align: center;
 }

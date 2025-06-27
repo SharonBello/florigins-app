@@ -1,228 +1,261 @@
-import { useRef, useState, type JSX } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { flowerDefinitions, questions } from "../../data/appData";
-import type { Answers } from "../../types/Answers";
-import { Flower } from "../Flower/Flower";
-import { FormStep } from "../FormStep/FormStep";
+import { flowerDefinitions, questions } from '../../data/appData';
+import type { Answers } from '../../types/Answers';
+import { Flower } from '../Flower/Flower';
+import { FormStep } from '../FormStep/FormStep';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button, IconButton, Typography } from '@mui/material';
 import './FormScreen.scss';
 import type { Question } from '../../types/Question';
-import React from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { db } from '../../../firebase';
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc } from 'firebase/firestore';
 
-const PrintableFlower = React.forwardRef<HTMLDivElement, { answers: Answers; summary: string }>((
-    { answers, summary }, ref) => (
-    <div className="print-layout" ref={ref}>
-        <header className="print-header">
-            <Typography style={{ fontFamily: 'Heebo' }}>{(answers.name as string) || 'הפרח שלך'}</Typography>
-            <Typography dir="ltr">Florigins</Typography>
-        </header>
-        <div className="print-flower-container">
-            <Flower answers={answers} viewBox="-50 -50 300 300" />
+interface PrintableFlowerProps {
+    answers: Answers;
+    summary: string;
+}
+
+const PrintableFlower = forwardRef<HTMLDivElement, PrintableFlowerProps>(
+    ({ answers, summary }, ref): ReactElement => (
+        <div className="print-layout" ref={ref}>
+            <header className="print-header">
+                <Typography style={{ fontFamily: 'Heebo' }}>
+                    {(answers.name as string) || 'הפרח שלך'}
+                </Typography>
+                <Typography dir="ltr">Florigins</Typography>
+            </header>
+            <div className="print-flower-container">
+                <Flower answers={answers} viewBox="-10 -10 200 200" />
+            </div>
+            <footer className="print-footer">
+                <Typography className="summary-text">{summary}</Typography>
+            </footer>
         </div>
-        <footer className="print-footer">
-            <Typography className="summary-text">{summary}</Typography>
-        </footer>
-    </div>
-));
+    )
+);
 
-export const FormScreen: React.FC = (): JSX.Element => {
+PrintableFlower.displayName = 'PrintableFlower';
+
+export const FormScreen: React.FC = (): ReactElement => {
     const navigate = useNavigate();
     const [answers, setAnswers] = useState<Answers>({});
-    const printComponentRef = useRef<HTMLDivElement>(null);
+    const [isPrinting, setIsPrinting] = useState<boolean>(false);
+    const printableRef = useRef<HTMLDivElement>(null);
+    const displayRef = useRef<HTMLDivElement>(null);
 
-    const allQuestionsAnswered = React.useMemo(() => {
-        const requiredQuestions = questions.filter(q => q.id !== 'name' && q.id !== 'belonging');
-        return requiredQuestions.every(question => {
-            const answer = answers[question.id];
-            if (typeof answer === 'number') return true;
-            if (typeof answer === 'string' && answer.trim() !== '') return true;
-            return !!answer;
-        });
-    }, [answers]);
+    const summaryString: string = questions.map((q): string | null => {
+        if (q.id === 'name' || q.id === 'belonging') return null;
+        const ans = answers[q.id];
+        if (!ans) return null;
+        if (typeof ans === 'string' && ans.trim() === '') return null;
 
-    const handleExportPdf = async () => {
-        if (!allQuestionsAnswered || !printComponentRef.current) return;
-        
-        try {
-            const docRef = await addDoc(collection(db, "submittedFlowers"), answers);
-            console.info("Flower saved with ID: ", docRef.id);
-        } catch (e) {
-            console.error("Error adding document: ", e);
+        if (q.type.includes('_select')) {
+            const def = flowerDefinitions.find((d) => d.country === ans);
+            if (def) {
+                switch (q.type) {
+                    case 'country_select':
+                        return def.countryHebrew;
+                    case 'language_select':
+                        return def.languageHebrew;
+                    case 'cuisine_select':
+                        return def.cuisineHebrew;
+                    case 'culture_select':
+                        return def.cultureHebrew;
+                }
+            }
         }
 
-        const newWindow = window.open("", "_blank");
+        return String(ans);
+    }).filter((s): s is string => Boolean(s)).join(' * ');
+
+    const generatePdfAndNavigate = useCallback(async (): Promise<void> => {
+        if (!answers.id || !printableRef.current) {
+            setIsPrinting(false);
+            return;
+        }
+
+        const newWindow: Window | null = window.open('', '_blank');
         if (!newWindow) {
-            alert('Popup blocked! Please allow popups for this site to view the PDF.');
+            alert('Popup blocked! Please allow popups for this site.');
+            setIsPrinting(false);
             return;
         }
         newWindow.document.write('<h1>Generating your flower PDF...</h1>');
 
-        html2canvas(printComponentRef.current, { scale: 3, useCORS: true, backgroundColor: null })
-            .then((canvas) => {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = pdf.internal.pageSize.getHeight();
+        setTimeout((): void => {
+            html2canvas(printableRef.current!, {
+                scale: 1,
+                useCORS: true,
+                backgroundColor: null,
+            }).then((canvas) => {
+                const imgData: string = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4',
+                });
+                const pdfW: number = pdf.internal.pageSize.getWidth();
+                const pdfH: number = pdf.internal.pageSize.getHeight();
                 pdf.setFillColor('#F7F0E6');
-                pdf.rect(0, 0, pdfWidth, pdfHeight, 'F');
-                
-                const canvasAspectRatio = canvas.width / canvas.height;
-                let finalImgWidth, finalImgHeight;
-                const margin = 15;
-                const printableWidth = pdfWidth - (margin * 2);
-                const printableHeight = pdfHeight - (margin * 2);
+                pdf.rect(0, 0, pdfW, pdfH, 'F');
 
-                if (canvasAspectRatio > (printableWidth / printableHeight)) {
-                    finalImgWidth = printableWidth;
-                    finalImgHeight = printableWidth / canvasAspectRatio;
+                const ratio: number = canvas.width / canvas.height;
+                const margin: number = 15;
+                const maxW: number = pdfW - margin * 2;
+                const maxH: number = pdfH - margin * 2;
+                let finalW: number, finalH: number;
+
+                if (ratio > maxW / maxH) {
+                    finalW = maxW;
+                    finalH = maxW / ratio;
                 } else {
-                    finalImgHeight = printableHeight;
-                    finalImgWidth = printableHeight * canvasAspectRatio;
+                    finalH = maxH;
+                    finalW = maxH * ratio;
                 }
 
-                const x = (pdfWidth - finalImgWidth) / 2;
-                const y = (pdfHeight - finalImgHeight) / 2;
-                
-                pdf.addImage(imgData, 'PNG', x, y, finalImgWidth, finalImgHeight);
-                
-                const pdfBlob = pdf.output('blob');
-                const pdfUrl = URL.createObjectURL(pdfBlob);
+                const x: number = (pdfW - finalW) / 2;
+                const y: number = (pdfH - finalH) / 2;
+                pdf.addImage(imgData, 'PNG', x, y, finalW, finalH);
 
-                newWindow.location.href = pdfUrl;
+                const blob = pdf.output('blob');
+                const url = URL.createObjectURL(blob);
+                newWindow.location.href = url;
                 newWindow.document.title = (answers.name as string) || 'Florigins';
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-                setTimeout(() => URL.revokeObjectURL(pdfUrl), 1000);
-                navigate('/results')
-            })
-            .catch(err => {
-                console.error("Error generating PDF:", err);
-                if(newWindow) newWindow.close();
+                navigate('/results', { state: { answers } });
+            }).catch((err) => {
+                console.error('Error generating PDF:', err);
+                newWindow.close();
+            }).finally(() => {
+                setIsPrinting(false);
             });
+        }, 100);
+    }, [answers, navigate]);
+
+    useEffect((): void => {
+        if (isPrinting) {
+            void generatePdfAndNavigate();
+        }
+    }, [isPrinting, generatePdfAndNavigate]);
+
+    const allQuestionsAnswered: boolean = questions.filter((q) => q.id !== 'name' && q.id !== 'belonging').every((q) => {
+        const ans = answers[q.id];
+        if (typeof ans === 'number') return true;
+        if (typeof ans === 'string') return ans.trim() !== '';
+        return Boolean(ans);
+    });
+
+    const handleExportPdf = async (): Promise<void> => {
+        if (!allQuestionsAnswered) return;
+        try {
+            const docRef = await addDoc(collection(db, 'submittedFlowers'), answers);
+            setAnswers((prev) => ({ ...prev, id: docRef.id }));
+            setIsPrinting(true);
+        } catch (e) {
+            console.error('Error saving flower:', e);
+        }
     };
 
-    const handleBack = () => {
+    const handleBack = (): void => {
         navigate('/');
     };
 
-    const handleReset = () => {
+    const handleReset = (): void => {
         setAnswers({});
     };
 
-    const handleAnswerChange = (questionId: string, value: unknown) => {
-        setAnswers(prev => ({ ...prev, [questionId]: value }));
+    const handleAnswerChange = (questionId: string, value: unknown): void => {
+        setAnswers((prev) => ({ ...prev, [questionId]: value }));
     };
 
     function findQuestion(id: string): Question {
-        const question = questions.find(q => q.id === id);
-        if (!question) {
+        const q = questions.find((q) => q.id === id);
+        if (!q) {
             throw new Error(`Question with id "${id}" not found.`);
         }
-        return question;
+        return q;
     }
-
-    const getDisplayValue = (question: Question, value: string): string => {
-        if (!value) return '';
-        if (question.type.includes('_select')) {
-            const definition = flowerDefinitions.find(def => def.country === value);
-            if (definition) {
-                switch (question.type) {
-                    case 'country_select': return definition.countryHebrew;
-                    case 'language_select': return definition.languageHebrew;
-                    case 'cuisine_select': return definition.cuisineHebrew;
-                    case 'culture_select': return definition.cultureHebrew;
-                    default: return value;
-                }
-            }
-        }
-        return value;
-    };
-
-    const summaryString = questions
-        .map(q => {
-            const answer = answers[q.id];
-            if (answer && q.id !== 'name' && q.id !== 'belonging') {
-                return getDisplayValue(findQuestion(q.id), answer as string);
-            }
-            return null;
-        })
-        .filter(Boolean)
-        .join(' * ');
-
-    const belongingQuestion = findQuestion('belonging');
+    const belongingQuestion: Question = findQuestion('belonging');
 
     return (
         <div className="form-screen-container">
             <style>
                 {`
-                    .offscreen-print-wrapper {
-                        position: absolute;
-                        left: -9999px; /* Move it off-screen */
-                        top: 0;
-                        /* A4 landscape aspect ratio (297/210) at a reasonable size */
-                        width: 1123px;
-                        height: 794px;
-                    }
+                .offscreen-print-wrapper {
+                    position: absolute;
+                    left: -9999px;
+                    top: 0;
+                    width: 1123px;
+                    height: 794px;
+                }
 
-                    .print-layout {
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: space-between;
-                        align-items: center;
-                        padding: 3rem;
-                        box-sizing: border-box;
-                        background-color: #F7F0E6;
-                    }
-                     .print-header {
-                       width: 100%;
-                       display: flex;
-                       justify-content: space-between;
-                       align-items: center;
-                       border-bottom: 1px solid #ccc;
-                       padding-bottom: 1rem;
-                       font-family: 'Heebo', sans-serif;
-                       flex-shrink: 0;
-                       color: #333;
-                    }
-                    .print-flower-container {
-                       flex-grow: 1;
-                       width: 100%;
-                       height: 1px;
-                       display: flex;
-                       align-items: center;
-                       justify-content: center;
-                    }
-                    .print-flower-container svg {
-                       max-height: 95%;
-                       max-width: 95%;
-                    }
-                    .print-footer {
-                       width: 100%;
-                       border-top: 1px solid #ccc;
-                       padding-top: 1rem;
-                       text-align: center;
-                       flex-shrink: 0;
-                    }
-                    .summary-text {
-                       font-family: 'Heebo', sans-serif;
-                       font-size: 14pt;
-                       color: #333;
-                       letter-spacing: 0.05em;
-                    }
-                `}
+                .print-layout {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 1rem;
+                    box-sizing: border-box;
+                    background-color: #F7F0E6;
+                }
+
+                .print-header {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding-bottom: 0.5rem;
+                    border-bottom: 1px solid #ccc;
+                    font-family: 'Heebo', sans-serif;
+                    letter-spacing: 0.2em;
+                    color: #333;
+                }
+
+                .print-flower-container {
+                    flex-grow: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-bottom: 1px solid #ccc;
+                    padding-bottom: 1rem;
+                }
+
+                .print-flower-container svg {
+                    max-width: 100%;
+                    max-height: 100%;
+                }
+
+                .print-footer {
+                    width: 100%;
+                    padding-top: 0.5rem;
+                    border-top: none;
+                    text-align: center;
+                }
+
+                .summary-text {
+                    font-family: 'Heebo', sans-serif;
+                    font-size: 14pt;
+                    letter-spacing: 0.05em;
+                    color: #333;
+                }
+            `}
             </style>
-
-            {/* The printable component is rendered in a sized, off-screen wrapper */}
+            {/* Off-screen printable layout */}
             <div className="offscreen-print-wrapper">
-                <PrintableFlower ref={printComponentRef} answers={answers} summary={summaryString} />
+                <PrintableFlower
+                    ref={printableRef}
+                    answers={answers}
+                    summary={summaryString}
+                />
             </div>
 
+            {/* Your existing form panel */}
             <div className="form-panel">
                 <section className="form-header">
                     <div onClick={handleBack} className="back-button">
@@ -237,20 +270,20 @@ export const FormScreen: React.FC = (): JSX.Element => {
                 <hr className="section-divider" />
 
                 <main className="form-main-content">
-                    {/* Section: שם */}
+                    {/* 1) Name */}
                     <div className="form-name-section">
                         <FormStep question={findQuestion('name')} value={answers['name']} onChange={(v) => handleAnswerChange('name', v)} />
                     </div>
                     <hr className="section-divider" />
 
-                    {/* Section: זהות מגדרית */}
+                    {/* 2) Gender Identity */}
                     <div className="form-genderId-section">
                         <h3 className="section-title">זהות מגדרית</h3>
                         <FormStep question={findQuestion('genderIdentity')} value={answers['genderIdentity']} onChange={(v) => handleAnswerChange('genderIdentity', v)} showLabel={false} />
                     </div>
                     <hr className="section-divider" />
 
-                    {/* Section: מוצא */}
+                    {/* 3) Origins */}
                     <div className="form-legacy-country-section">
                         <h3 className="section-title">מוצא</h3>
                         <FormStep question={findQuestion('origin_p1_grandpa')} value={answers['origin_p1_grandpa']} onChange={(v) => handleAnswerChange('origin_p1_grandpa', v)} />
@@ -260,6 +293,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     </div>
                     <hr className="section-divider" />
 
+                    {/* 4) Belonging */}
                     <div className="form-belonging-section">
                         <h3 className="section-title">שייכות</h3>
                         <FormStep question={belongingQuestion} value={answers['belonging']} onChange={v => handleAnswerChange('belonging', v)}
@@ -359,6 +393,7 @@ export const FormScreen: React.FC = (): JSX.Element => {
                 </div>
             </div>
 
+            {/* On-screen flower preview */}
             <div className="flower-panel">
                 <header className="form-header-container">
                     <div className='header-title-container'>
@@ -369,9 +404,11 @@ export const FormScreen: React.FC = (): JSX.Element => {
                     </div>
                     <hr className="form-border" />
                 </header>
-                <Flower answers={answers} viewBox="-95 -95 390 390" />
-                <div className="form-footer-container screen-only">
-                    <hr className="form-border" />
+                <div ref={displayRef} className="flower-display-wrapper">
+                    <Flower answers={answers} viewBox="-100 -20 390 390" />
+                    <div className="form-footer-container screen-only">
+                        <hr className="form-border" />
+                    </div>
                 </div>
             </div>
         </div>
