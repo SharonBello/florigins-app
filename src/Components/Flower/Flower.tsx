@@ -213,9 +213,35 @@ export const Flower = ({ answers, viewBox, showTooltip = true }: FlowerProps) =>
                   title={renderTooltipTitle(pd.key)}
                   placement={placement}
                   key={pd.key}
-                  slotProps={{
-                    tooltip: { className: 'custom-tooltip' },
-                    popper: { modifiers: [{ name: 'offset', options: { offset } }] }
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        backgroundColor: '#fff',
+                        color: 'rgba(0, 0, 0, 0.87)',
+                        borderRadius: '48px',
+                        padding: '10px 20px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                        textAlign: 'right',
+                        direction: 'rtl',
+                        '& .MuiTypography-root': {
+                          fontFamily: "'Heebo', sans-serif",
+                          letterSpacing: '0.2em',
+                          fontWeight: 300,
+                          color: '#333'
+                        },
+                        '& .MuiTypography-caption': {
+                          fontSize: '0.8rem',
+                          opacity: 0.8,
+                        },
+                        '& .MuiTypography-body2': {
+                          fontSize: '0.8rem',
+                          fontWeight: 500,
+                        },
+                      },
+                    },
+                    popper: {
+                      modifiers: [{ name: 'offset', options: { offset } }],
+                    },
                   }}
                 >
                   {petalNode}

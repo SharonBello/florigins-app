@@ -2,10 +2,25 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Typography } from '@mui/material';
 import './HomeScreen.scss';
 import { HomePageFlowerIcon } from '../../assets/icons/HomePageFlowerIcon';
+import { useEffect, useState } from 'react';
 
 
 export const HomeScreen = () => {
     const navigate = useNavigate();
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup the event listener when the component unmounts
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     const handleStart = () => {
         navigate('/form');
@@ -14,6 +29,19 @@ export const HomeScreen = () => {
     const handleGallery = () => {
         navigate('/gallery');
     };
+
+    if (isMobile) {
+        return (
+            <div className="mobile-blocker-container" dir="rtl">
+                <div className="homepage-flower-container">
+                    <HomePageFlowerIcon />
+                </div>
+                <Typography className="mobile-blocker-message">
+                    יש לפתוח את האפליקציה במחשב
+                </Typography>
+            </div>
+        );
+    }
 
     return (
         <div className="homepage-container" dir="rtl">

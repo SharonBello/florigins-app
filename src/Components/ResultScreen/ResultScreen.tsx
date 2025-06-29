@@ -1,15 +1,137 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { Flower } from '../Flower/Flower';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ShareIcon from '@mui/icons-material/Share';
 import './ResultScreen.scss'
+import type { Question } from '../../types/Question';
+import { flowerDefinitions, questions } from '../../data/appData';
+import type { Answers } from '../../types/Answers';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../../firebase';
+
+const traitDisplayNames: Record<string, string> = {
+    origin_p1_grandpa: 'מוצא',
+    origin_p1_grandma: 'מוצא',
+    origin_p2_grandpa: 'מוצא',
+    origin_p2_grandma: 'מוצא',
+    childhoodEnvironment: 'סביבת ילדות',
+    favoriteCuisine: 'מטבח אהוב',
+    countryToLive: 'מדינת מגורים מועדפת',
+    politicalView: 'השקפה פוליטית',
+    diet: 'תזונה',
+    religion: 'דת',
+};
 
 export const ResultScreen = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const answers = location.state?.answers || {};
     const flowerRef = useRef<HTMLDivElement>(null);
+    const [description, setDescription] = useState('...טוען נתונים סטטיסטיים');
+
+    const findQuestion = (id: string): Question | undefined => {
+        return questions.find(q => q.id === id);
+    }
+
+    const getDisplayValue = (question: Question, value: string): string => {
+        if (!value) return '';
+        if (question.type.includes('_select')) {
+            const definition = flowerDefinitions.find(def => def.country === value);
+            if (definition) {
+                switch (question.type) {
+                    case 'country_select': return definition.countryHebrew;
+                    case 'language_select': return definition.languageHebrew;
+                    case 'cuisine_select': return definition.cuisineHebrew;
+                    case 'culture_select': return definition.cultureHebrew;
+                    default: return value;
+                }
+            }
+        }
+        return value;
+    };
+
+    useEffect(() => {
+        const generateStats = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "submittedFlowers"));
+                const allFlowers: Answers[] = [];
+                querySnapshot.forEach((doc) => {
+                    allFlowers.push({ id: doc.id, ...doc.data() });
+                });
+
+                if (allFlowers.length < 2) {
+                    setDescription('הפרח שלך הוא הראשון מסוגו במאגר!');
+                    return;
+                }
+
+                const primaryTraits: (keyof Answers)[] = ['origin_p1_grandpa', 'origin_p1_grandma', 'origin_p2_grandpa', 'origin_p2_grandma', 'childhoodEnvironment'];
+                const secondaryTraits: (keyof Answers)[] = ['favoriteCuisine', 'countryToLive', 'politicalView', 'diet', 'religion'];
+
+                const validPrimaryTraits = primaryTraits.filter(trait => answers[trait]);
+                const validSecondaryTraits = secondaryTraits.filter(trait => answers[trait]);
+
+                if (validPrimaryTraits.length === 0 || validSecondaryTraits.length < 2) {
+                    setDescription('הפרח שלך ייחודי בדרכו שלו.');
+                    return;
+                }
+
+                const primaryTrait = validPrimaryTraits[Math.floor(Math.random() * validPrimaryTraits.length)];
+
+                const shuffledSecondary = validSecondaryTraits.sort(() => 0.5 - Math.random());
+                const secondaryTrait1 = shuffledSecondary[0];
+                const secondaryTrait2 = shuffledSecondary[1];
+
+                const primaryValue = answers[primaryTrait];
+                const secondaryValue1 = answers[secondaryTrait1];
+                const secondaryValue2 = answers[secondaryTrait2];
+
+                const primaryQuestion = findQuestion(primaryTrait as string);
+                const secondaryQuestion1 = findQuestion(secondaryTrait1 as string);
+                const secondaryQuestion2 = findQuestion(secondaryTrait2 as string);
+
+                if (!primaryQuestion || !secondaryQuestion1 || !secondaryQuestion2) {
+                    setDescription("טקסט תיאור הפרח יוצג כאן...");
+                    return;
+                }
+
+                // FIX: Use the new display name mapping
+                const primaryTraitDisplay = traitDisplayNames[primaryTrait as string] || primaryQuestion.label;
+                const secondaryTrait1Display = traitDisplayNames[secondaryTrait1 as string] || secondaryQuestion1.label;
+                const secondaryTrait2Display = traitDisplayNames[secondaryTrait2 as string] || secondaryQuestion2.label;
+
+                const primaryDisplay = getDisplayValue(primaryQuestion, primaryValue as string);
+                const secondaryDisplay1 = getDisplayValue(secondaryQuestion1, secondaryValue1 as string);
+                const secondaryDisplay2 = getDisplayValue(secondaryQuestion2, secondaryValue2 as string);
+
+                const totalWithPrimaryTrait = allFlowers.filter(flower => flower[primaryTrait] === primaryValue).length;
+                const matchingSubset = allFlowers.filter(flower =>
+                    flower[primaryTrait] === primaryValue &&
+                    flower[secondaryTrait1] === secondaryValue1 &&
+                    flower[secondaryTrait2] === secondaryValue2
+                ).length;
+
+                let finalSentence = '';
+                if (matchingSubset <= 1) {
+                    if (totalWithPrimaryTrait <= 1) {
+                        finalSentence = `את/ה היחיד/ה עם ${primaryTraitDisplay} של ${primaryDisplay} וגם היחיד/ה שאוהב/ת ${secondaryTrait1Display} (${secondaryDisplay1}) ו${secondaryTrait2Display} (${secondaryDisplay2}).`;
+                    } else {
+                        finalSentence = `מבין ${totalWithPrimaryTrait} אנשים עם ${primaryTraitDisplay} של ${primaryDisplay}, את/ה היחיד/ה שאוהב/ת גם ${secondaryTrait1Display} (${secondaryDisplay1}) וגם ${secondaryTrait2Display} (${secondaryDisplay2}).`;
+                    }
+                } else {
+                    finalSentence = `מבין ${totalWithPrimaryTrait} אנשים עם ${primaryTraitDisplay} של ${primaryDisplay}, את/ה אחד/ת מתוך ${matchingSubset} שחולקים אהבה ל${secondaryTrait1Display} (${secondaryDisplay1}) וגם ל${secondaryTrait2Display} (${secondaryDisplay2}).`;
+                }
+
+                setDescription(finalSentence);
+
+            } catch (error) {
+                console.error("Error generating stats: ", error);
+                setDescription('...לא ניתן היה לטעון נתונים סטטיסטיים');
+            }
+        };
+
+        generateStats();
+    }, [answers]);
 
     const handleStartOver = () => {
         navigate('/form');
@@ -116,11 +238,11 @@ export const ResultScreen = () => {
                 </header>
 
                 <div ref={flowerRef} className="flower-display-container">
-                    <Flower answers={answers} viewBox="-40 -50 280 280" />
+                    <Flower answers={answers} viewBox="-50 -40 300 300" />
                 </div>
 
                 <p className="result-description">
-                    ...טקסט תיאור הפרח יוצג כאן
+                    {description}
                 </p>
 
                 <div className="result-actions">

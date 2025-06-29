@@ -85,3 +85,34 @@
         }
     }
 }
+
+.mobile-blocker-container {
+    background-color: $background-color;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    box-sizing: border-box;
+
+    .homepage-flower-container {
+        width: 80vw;
+        max-width: 300px;
+        margin-bottom: 2rem;
+
+        svg {
+            width: 100%;
+            height: auto;
+        }
+    }
+
+    .mobile-blocker-message {
+        font-family: $main-font;
+        font-size: 1.2rem;
+        color: $text-color;
+        text-align: center;
+        letter-spacing: 0.1em;
+    }
+}
