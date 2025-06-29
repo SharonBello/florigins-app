@@ -10,19 +10,6 @@ import type { Answers } from '../../types/Answers';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../../firebase';
 
-const traitDisplayNames: Record<string, string> = {
-    origin_p1_grandpa: 'מוצא',
-    origin_p1_grandma: 'מוצא',
-    origin_p2_grandpa: 'מוצא',
-    origin_p2_grandma: 'מוצא',
-    childhoodEnvironment: 'סביבת ילדות',
-    favoriteCuisine: 'מטבח אהוב',
-    countryToLive: 'מדינת מגורים מועדפת',
-    politicalView: 'השקפה פוליטית',
-    diet: 'תזונה',
-    religion: 'דת',
-};
-
 const genderedTerms: Record<string, { pronoun: string; unique: string; sharing: string; adjectiveSuffix: string }> = {
     'אשה': { pronoun: 'את', unique: 'היחידה', sharing: 'אחת', adjectiveSuffix: 'ת' },
     'אשה טראנסית': { pronoun: 'את', unique: 'היחידה', sharing: 'אחת', adjectiveSuffix: 'ת' },
@@ -40,6 +27,30 @@ const politicalAdjectives: Record<string, string> = {
     'שמאל מרכז': 'שמאל-מרכז',
     'שמאל': 'שמאלנית',
 };
+
+function getCombinations<T>(arr: T[], size: number): T[][] {
+    const result: T[][] = [];
+    function combine(startIndex: number, combination: T[]) {
+        if (combination.length === size) {
+            result.push([...combination]);
+            return;
+        }
+        for (let i = startIndex; i < arr.length; i++) {
+            combination.push(arr[i]);
+            combine(i + 1, combination);
+            combination.pop();
+        }
+    }
+    combine(0, []);
+    return result;
+}
+const shuffleArray = <T,>(array: T[]): T[] => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
 
 export const ResultScreen = () => {
     const navigate = useNavigate();
@@ -89,15 +100,13 @@ export const ResultScreen = () => {
                     setDescription('הפרח שלך הוא הראשון מסוגו במאגר!');
                     return;
                 }
-                
+
                 const possibleTraits: (keyof Answers)[] = [
                     'origin_p1_grandpa', 'origin_p1_grandma', 'origin_p2_grandpa', 'origin_p2_grandma',
                     'childhoodEnvironment', 'favoriteCuisine', 'countryToLive', 'politicalView', 'diet', 'religion'
                 ];
 
                 const validUserTraits = possibleTraits.filter(trait => answers[trait]);
-                const shuffledTraits = validUserTraits.sort(() => 0.5 - Math.random());
-
                 let bestCombination: (keyof Answers)[] = [];
                 let bestMatchCount = 0;
 
@@ -107,33 +116,26 @@ export const ResultScreen = () => {
                         return traits.every(trait => flower[trait] === answers[trait]);
                     }).length;
                 };
-                
-                if (shuffledTraits.length >= 3) {
-                    const combination = shuffledTraits.slice(0, 3);
-                    const count = checkCombination(combination);
-                    if (count > 0) {
-                        bestCombination = combination;
-                        bestMatchCount = count;
+
+                for (let comboSize = 3; comboSize >= 1; comboSize--) {
+                    if (validUserTraits.length >= comboSize) {
+                        const combinations = getCombinations(validUserTraits, comboSize);
+                        const shuffledCombinations = shuffleArray(combinations);
+
+                        for (const combination of shuffledCombinations) {
+                            const count = checkCombination(combination);
+                            if (count > 0) {
+                                bestCombination = combination;
+                                bestMatchCount = count;
+                                break;
+                            }
+                        }
+                    }
+                    if (bestCombination.length > 0) {
+                        break;
                     }
                 }
-                
-                if (bestCombination.length === 0 && shuffledTraits.length >= 2) {
-                     const combination = shuffledTraits.slice(0, 2);
-                     const count = checkCombination(combination);
-                     if (count > 0) {
-                         bestCombination = combination;
-                         bestMatchCount = count;
-                     }
-                }
-                
-                 if (bestCombination.length === 0 && shuffledTraits.length >= 1) {
-                     const combination = shuffledTraits.slice(0, 1);
-                     const count = checkCombination(combination);
-                     if (count > 0) {
-                         bestCombination = combination;
-                         bestMatchCount = count;
-                     }
-                }
+
 
                 if (bestCombination.length > 0) {
                     const gender = (answers.genderIdentity as string) || 'default';
@@ -143,7 +145,7 @@ export const ResultScreen = () => {
                         const question = findQuestion(trait as string)!;
                         const value = answers[trait] as string;
                         const valueDisplay = getDisplayValue(question, value);
-                        
+
                         if (trait.toString().includes('origin')) {
                             return `מוצא מ${valueDisplay}`;
                         }
@@ -155,8 +157,8 @@ export const ResultScreen = () => {
                         }
                         if (trait === 'politicalView') {
                             const baseAdjective = politicalAdjectives[value] || value;
-                            const finalAdjective = baseAdjective.endsWith('י') 
-                                ? baseAdjective.slice(0, -1) + terms.adjectiveSuffix 
+                            const finalAdjective = baseAdjective.endsWith('י')
+                                ? baseAdjective.slice(0, -1) + terms.adjectiveSuffix
                                 : baseAdjective;
                             return `השקפה פוליטית ${finalAdjective}`;
                         }
@@ -164,27 +166,27 @@ export const ResultScreen = () => {
                     });
 
                     const uniquePhrases = [...new Set(descriptivePhrases)];
-                    const traitsDescription = uniquePhrases.join(' ,').replace(/,([^,]*)$/, 'ו$1');
-
                     const totalMatches = bestMatchCount + 1;
-                    
+
                     let finalSentence = '';
-                    
-                    // FIX: Improved sentence structure for single vs. multiple traits
-                    if (uniquePhrases.length === 1) {
+
+                     if (uniquePhrases.length === 1) {
                         const singleTraitDescription = uniquePhrases[0];
-                         if (totalMatches === 1) {
-                            finalSentence = `${terms.pronoun} ${terms.unique} עם ${singleTraitDescription}`;
+                         if (totalMatches <= 1) {
+                            finalSentence = `${terms.pronoun} ${terms.unique} עם ${singleTraitDescription}.`;
                         } else {
-                            finalSentence = `${terms.pronoun} ${terms.sharing} מתוך ${totalMatches} עם ${singleTraitDescription}`;
+                            finalSentence = `${terms.pronoun} ${terms.sharing} מתוך ${totalMatches} עם ${singleTraitDescription}.`;
                         }
                     } else {
-                        // FIX: Use ', ' joiner for correct Hebrew comma spacing
-                        const traitsDescription = uniquePhrases.join(',').replace(/,([^,]*)$/, ' ו$1');
-                        if (totalMatches === 1) {
-                           finalSentence = `${terms.pronoun} ${terms.unique} עם השילוב של ${traitsDescription}`;
+                        // FIX: Manually construct the list string for perfect Hebrew grammar
+                        const allButLast = uniquePhrases.slice(0, -1).join(', ');
+                        const last = uniquePhrases.slice(-1)[0];
+                        const traitsDescription = `${allButLast} ו${last}`;
+
+                        if (totalMatches <= 1) {
+                           finalSentence = `${terms.pronoun} ${terms.unique} עם השילוב של ${traitsDescription}.`;
                         } else {
-                            finalSentence = `${terms.pronoun} ${terms.sharing} מתוך ${totalMatches} שחולקים את השילוב של ${traitsDescription}`;
+                            finalSentence = `${terms.pronoun} ${terms.sharing} מתוך ${totalMatches} שחולקים את השילוב של ${traitsDescription}.`;
                         }
                     }
                     setDescription(finalSentence);
@@ -201,7 +203,6 @@ export const ResultScreen = () => {
 
         generateStats();
     }, [answers]);
-
 
 
     const handleStartOver = () => {
