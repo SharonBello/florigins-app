@@ -16,7 +16,7 @@ const groupableQuestionIDs = [
 export const GalleryScreen: React.FC = () => {
     const navigate = useNavigate();
     const [allFlowers, setAllFlowers] = useState<Answers[]>([]);
-    const [groupByKey, setGroupByKey] = useState<keyof Answers>('genderIdentity');
+    const [groupByKey, setGroupByKey] = useState<keyof Answers | null>(null);
 
     useEffect(() => {
         const flowersCollectionRef = collection(db, "submittedFlowers");
@@ -49,6 +49,10 @@ export const GalleryScreen: React.FC = () => {
 
     const groupedFlowers = useMemo(() => {
         const groups: { [key: string]: Answers[] } = {};
+        if (!groupByKey) {
+            groups['כל הפרחים'] = allFlowers;
+            return Object.entries(groups);
+        }
 
         if (groupByKey === 'origin') {
             allFlowers.forEach(flower => {
@@ -99,6 +103,10 @@ export const GalleryScreen: React.FC = () => {
         navigate('/');
     };
 
+    const handleFilterClick = (id: keyof Answers) => {
+        setGroupByKey(prevKey => (prevKey === id ? null : id));
+    };
+
     return (
         <div className="gallery-screen-container">
             <div className="gallery-main-panel">
@@ -106,21 +114,37 @@ export const GalleryScreen: React.FC = () => {
                     <Typography className="app-name" dir="ltr">Florigins</Typography>
                     <hr />
                 </header>
-                <div className="gallery-content">
-                    {groupedFlowers.map(([groupName, flowersInGroup]: [string, Answers[]]) => (
+                <div className={`gallery-content ${!groupByKey ? 'is-unfiltered' : ''}`}>
+                    {groupedFlowers.map(([groupName, flowersInGroup]) => (
                         <div key={groupName} className="gallery-group">
-                            <Typography variant="h5" className="gallery-group-title">{groupName}</Typography>
+                            {groupByKey && (
+                                <Typography variant="h5" className="gallery-group-title">
+                                    {groupName}
+                                </Typography>
+                            )}
                             <div className="gallery-bunch-container">
-                                {flowersInGroup.map((flowerAnswers: Answers, index: number) => {
+                                {flowersInGroup.map((flowerAnswers, index) => {
+                                    const isUnfiltered = !groupByKey;
+                                    const style: React.CSSProperties = {};
+
+                                    if (isUnfiltered) {
+                                        const angle = (index / flowersInGroup.length) * 2 * Math.PI;
+                                        const radius = Math.pow(Math.random(), 0.4) * Math.min(flowersInGroup.length * 12, 220);
+                                        const x = Math.cos(angle) * radius;
+                                        const y = Math.sin(angle) * radius;
+                                        style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${(Math.random() - 0.5) * 30}deg)`;
+                                        style.zIndex = index;
+                                    } else {
+                                        style.transform = `translateY(${index % 2 === 0 ? '-20px' : '10px'})`;
+                                        style.transition = 'transform 0.8s';
+                                        style.zIndex = 10 + (flowersInGroup.length - index);
+                                    }
+
                                     return (
                                         <div
                                             key={`${flowerAnswers.id || index}-${groupName}`}
-                                            className={`gallery-item`}
-                                            style={{
-                                                transform: `translateY(${index % 2 === 0 ? '-20px' : '10px'})`,
-                                                transition: 'transform 0.8s',
-                                                zIndex: 10 + (flowersInGroup.length - index),
-                                            }}
+                                            className="gallery-item"
+                                            style={style}
                                             onClick={() => handleFlowerClick(flowerAnswers)}
                                         >
                                             <Flower answers={flowerAnswers} viewBox="-20 -20 250 250" showTooltip={false} />
@@ -129,8 +153,7 @@ export const GalleryScreen: React.FC = () => {
                                 })}
                             </div>
                         </div>
-                    )
-                    )}
+                    ))}
                 </div>
             </div>
             <div className="gallery-filter-panel">
@@ -153,7 +176,7 @@ export const GalleryScreen: React.FC = () => {
                             <div
                                 key={question.id}
                                 className={`filter-label-item ${groupByKey === question.id ? 'active' : ''}`}
-                                onClick={() => setGroupByKey(question.id as keyof Answers)}
+                                onClick={() => handleFilterClick(question.id as keyof Answers)}
                             >
                                 <Typography>{question.label}</Typography>
                             </div>
