@@ -72,28 +72,73 @@
   height: 100%;
 
   .filter-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     color: $text-color;
     font-family: $main-font;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
     flex-shrink: 0;
-    padding: 1.5rem;
+    padding: unset;
+    padding-bottom: 0.1rem;
+
+    h6 {
+      font-family: $main-font !important;
+      font-weight: $font-weight-light !important;
+      font-size: 1rem !important;
+      color: #888 !important;
+      padding: 1.65rem 1rem 0.6rem 2rem;
+    }
 
     .back-button {
-      color: #888;
-      background: none;
-      border: none;
-      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      &:hover {
-        color: $text-color;
+      font-size: 1rem;
+      color: #888;
+      cursor: pointer;
+      transition: color 0.2s;
+      background: none;
+      border: none;
+      border-left: 1px solid $border-color;
+      height: 100%;
+      padding: 0;
+      font-family: $main-font;
+      font-weight: $font-weight-light;
+
+      .back-icon-container {
+        padding: 0.65rem 1rem 0.6rem 2rem;
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 1rem;
+
+        span {
+          padding: 1rem 0 0 0;
+        }
+
+        .back-icon-button {
+          transform: rotate(180deg);
+          padding: 0 0 1rem 0;
+
+          svg {
+            font-size: 1.2rem;
+          }
+        }
+
+        &:hover {
+          color: $text-color;
+        }
       }
     }
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid $border-color;
+    opacity: 0.3;
+    width: 100%;
   }
 
   .filter-list {
@@ -198,19 +243,29 @@
   align-items: center;
   justify-content: center;
 
+  @media (min-width: 1800px) {
+    gap: 2.5rem;
+  }
+
   .gallery-group {
     display: flex;
     flex-direction: column-reverse;
     align-items: center;
     justify-content: center;
 
+    @media (min-width: 1800px) {
+      gap: 1rem;
+    }
+
     h5 {
-      margin-block-start: -30px;
+      margin-block-start: 60px;
+      margin-block-end: 60px;
       letter-spacing: 0.2em;
       font-family: $main-font;
       font-weight: $font-weight-light;
     }
   }
+
   &.is-unfiltered {
     align-items: center;
     justify-content: center;
@@ -224,17 +279,30 @@
       position: relative; // Anchor for absolute positioning
       width: 1px;
       height: 1px;
+      transform: scale(1);
+      transition: transform 0.4s ease-out;
+
+      @media (max-width: 1200px) {
+        transform: scale(0.8);
+      }
+      @media (max-width: 992px) {
+        transform: scale(0.65);
+      }
+      @media (max-width: 768px) {
+        transform: scale(0.5);
+      }
+      @media (max-width: 576px) {
+        transform: scale(0.4);
+      }
     }
 
     .gallery-item {
-      position: absolute; // Allows layering and transform from center
+      position: absolute;
       top: 0;
       left: 0;
-      // Override the margin from the filtered view
       &:not(:first-child) {
         margin-right: 0;
       }
-      // The JS will provide the random transform for the bouquet effect
     }
   }
 }
@@ -244,6 +312,28 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
+  padding-bottom: 40px;
+  transform: scale(1);
+  transition: transform 0.4s ease-out;
+
+  @media (max-width: 1800px) {
+    transform: scale(0.9);
+  }
+  @media (max-width: 1400px) {
+    transform: scale(0.85);
+  }
+  @media (max-width: 1200px) {
+    transform: scale(0.8);
+  }
+  @media (max-width: 992px) {
+    transform: scale(0.65);
+  }
+  @media (max-width: 768px) {
+    transform: scale(0.5);
+  }
+  @media (max-width: 576px) {
+    transform: scale(0.4);
+  }
 }
 
 .gallery-item {
@@ -256,9 +346,11 @@
     transform 0.3s ease-out,
     z-index 0s 0.3s;
   transform-origin: center bottom;
+  margin-bottom: -130px;
 
   &:not(:first-child) {
-    margin-right: -160px;
+    margin-right: -90px;
+    margin-left: -50px;
   }
 
   &:hover {

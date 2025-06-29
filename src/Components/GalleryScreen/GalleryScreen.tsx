@@ -2,16 +2,28 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Flower } from '../Flower/Flower';
 import type { Answers } from '../../types/Answers';
-import { questions } from '../../data/appData';
-import { Button, Typography } from '@mui/material';
+import { flowerDefinitions, questions } from '../../data/appData';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { IconButton, Typography } from '@mui/material';
 import './GalleryScreen.scss';
 import { db } from '../../../firebase';
 import { collection, onSnapshot } from "firebase/firestore";
 
 const groupableQuestionIDs = [
-    'genderIdentity', 'origin', 'belonging', 'sexualOrientation', 'religion', 'politicalView', 'diet', 'childhoodEnvironment', 'countryToLive', 'languageToSpeak', 'favoriteCuisine', 'cultureToBelong'
+    'name', 'genderIdentity', 'origin', 'belonging', 'sexualOrientation', 'religion', 'politicalView', 'diet', 'childhoodEnvironment', 'countryToLive', 'languageToSpeak', 'favoriteCuisine', 'cultureToBelong'
 ];
+
+const getHebrewName = (value: string, key: keyof Answers): string => {
+    const definition = flowerDefinitions.find(def => def.country === value);
+    if (!definition) return value; // Fallback to the original value if no definition is found
+    switch (key) {
+        case 'countryToLive': return definition.countryHebrew;
+        case 'languageToSpeak': return definition.languageHebrew;
+        case 'favoriteCuisine': return definition.cuisineHebrew;
+        case 'cultureToBelong': return definition.cultureHebrew;
+        default: return value;
+    }
+};
 
 export const GalleryScreen: React.FC = () => {
     const navigate = useNavigate();
@@ -49,6 +61,8 @@ export const GalleryScreen: React.FC = () => {
 
     const groupedFlowers = useMemo(() => {
         const groups: { [key: string]: Answers[] } = {};
+        const countryBasedFilters = new Set(['countryToLive', 'languageToSpeak', 'favoriteCuisine', 'cultureToBelong']);
+
         if (!groupByKey) {
             groups['כל הפרחים'] = allFlowers;
             return Object.entries(groups);
@@ -74,11 +88,56 @@ export const GalleryScreen: React.FC = () => {
                     groups["לא ידוע"].push(flower);
                 } else {
                     uniqueOrigins.forEach(originCountry => {
-                        if (!groups[originCountry]) {
-                            groups[originCountry] = [];
+                        const countryDef = flowerDefinitions.find(def => def.country === originCountry);
+                        const hebrewName = countryDef ? countryDef.countryHebrew : originCountry;
+
+                        if (!groups[hebrewName]) {
+                            groups[hebrewName] = [];
                         }
-                        groups[originCountry].push(flower);
+                        groups[hebrewName].push(flower);
                     });
+                }
+            });
+        } else if (groupByKey === 'belonging') {
+            const belongingQuestion = questions.find(q => q.id === 'belonging');
+            const belongingOptions = belongingQuestion?.options || ['הורה 1', 'אין העדפה', 'הורה 2'];
+
+            allFlowers.forEach(flower => {
+                const belongingValue = flower.belonging as number;
+                let groupName = "לא הוגדר";
+
+                switch (belongingValue) {
+                    case -1:
+                        groupName = belongingOptions[0]; // הורה 1
+                        break;
+                    case 0:
+                        groupName = belongingOptions[1]; // אין העדפה
+                        break;
+                    case 1:
+                        groupName = belongingOptions[2]; // הורה 2
+                        break;
+                    default:
+                        groupName = belongingOptions[1];
+                        break;
+                }
+
+                if (!groups[groupName]) {
+                    groups[groupName] = [];
+                }
+                groups[groupName].push(flower);
+            });
+        } else if (countryBasedFilters.has(groupByKey)) {
+            allFlowers.forEach(flower => {
+                const value = flower[groupByKey] as string;
+                if (value) {
+                    const groupName = getHebrewName(value, groupByKey as keyof Answers);
+                    if (!groups[groupName]) {
+                        groups[groupName] = [];
+                    }
+                    groups[groupName].push(flower);
+                } else {
+                    if (!groups["ללא הגדרה"]) groups["ללא הגדרה"] = [];
+                    groups["ללא הגדרה"].push(flower);
                 }
             });
         } else {
@@ -158,12 +217,17 @@ export const GalleryScreen: React.FC = () => {
             </div>
             <div className="gallery-filter-panel">
                 <header className="filter-header">
-                    <Button onClick={handleBack} className="back-button">
-                        <ArrowBackIcon style={{ transform: 'rotate(180deg)' }} />
-                        <span>חזרה</span>
-                    </Button>
+                    <div onClick={handleBack} className="back-button">
+                        <article className="back-icon-container">
+                            <span>חזרה</span>
+                            <IconButton className="back-icon-button" size="small" aria-label="back">
+                                <ArrowBackIcon />
+                            </IconButton>
+                        </article>
+                    </div>
                     <Typography variant="h6">סינון</Typography>
                 </header>
+                <hr className="section-divider" />
                 <div className="filter-list">
                     {groupableQuestionIDs.map(id => {
                         const question = id === 'origin'
