@@ -23,6 +23,24 @@ const traitDisplayNames: Record<string, string> = {
     religion: 'דת',
 };
 
+const genderedTerms: Record<string, { pronoun: string; unique: string; sharing: string; adjectiveSuffix: string }> = {
+    'אשה': { pronoun: 'את', unique: 'היחידה', sharing: 'אחת', adjectiveSuffix: 'ת' },
+    'אשה טראנסית': { pronoun: 'את', unique: 'היחידה', sharing: 'אחת', adjectiveSuffix: 'ת' },
+    'גבר': { pronoun: 'אתה', unique: 'היחיד', sharing: 'אחד', adjectiveSuffix: '' },
+    'גבר טראנס': { pronoun: 'אתה', unique: 'היחיד', sharing: 'אחד', adjectiveSuffix: '' },
+    'א-בינארי': { pronoun: 'את/ה', unique: 'היחיד/ה', sharing: 'אחד/ת', adjectiveSuffix: 'ת' },
+    'ללא הגדרה': { pronoun: 'את/ה', unique: 'היחיד/ה', sharing: 'אחד/ת', adjectiveSuffix: 'ת' },
+    'default': { pronoun: 'את/ה', unique: 'היחיד/ה', sharing: 'אחד/ת', adjectiveSuffix: 'ת' }
+};
+
+const politicalAdjectives: Record<string, string> = {
+    'ימין': 'ימנית',
+    'ימין מרכז': 'ימין-מרכז',
+    'מרכז': 'מרכזית',
+    'שמאל מרכז': 'שמאל-מרכז',
+    'שמאל': 'שמאלנית',
+};
+
 export const ResultScreen = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -53,76 +71,127 @@ export const ResultScreen = () => {
 
     useEffect(() => {
         const generateStats = async () => {
+            if (!answers.id) {
+                setDescription("לא התקבל מידע על הפרח.");
+                return;
+            }
+
             try {
                 const querySnapshot = await getDocs(collection(db, "submittedFlowers"));
-                const allFlowers: Answers[] = [];
+                const allOtherFlowers: Answers[] = [];
                 querySnapshot.forEach((doc) => {
-                    allFlowers.push({ id: doc.id, ...doc.data() });
+                    if (doc.id !== answers.id) {
+                        allOtherFlowers.push({ id: doc.id, ...doc.data() });
+                    }
                 });
 
-                if (allFlowers.length < 2) {
+                if (allOtherFlowers.length === 0) {
                     setDescription('הפרח שלך הוא הראשון מסוגו במאגר!');
                     return;
                 }
+                
+                const possibleTraits: (keyof Answers)[] = [
+                    'origin_p1_grandpa', 'origin_p1_grandma', 'origin_p2_grandpa', 'origin_p2_grandma',
+                    'childhoodEnvironment', 'favoriteCuisine', 'countryToLive', 'politicalView', 'diet', 'religion'
+                ];
 
-                const primaryTraits: (keyof Answers)[] = ['origin_p1_grandpa', 'origin_p1_grandma', 'origin_p2_grandpa', 'origin_p2_grandma', 'childhoodEnvironment'];
-                const secondaryTraits: (keyof Answers)[] = ['favoriteCuisine', 'countryToLive', 'politicalView', 'diet', 'religion'];
+                const validUserTraits = possibleTraits.filter(trait => answers[trait]);
+                const shuffledTraits = validUserTraits.sort(() => 0.5 - Math.random());
 
-                const validPrimaryTraits = primaryTraits.filter(trait => answers[trait]);
-                const validSecondaryTraits = secondaryTraits.filter(trait => answers[trait]);
+                let bestCombination: (keyof Answers)[] = [];
+                let bestMatchCount = 0;
 
-                if (validPrimaryTraits.length === 0 || validSecondaryTraits.length < 2) {
-                    setDescription('הפרח שלך ייחודי בדרכו שלו.');
-                    return;
-                }
-
-                const primaryTrait = validPrimaryTraits[Math.floor(Math.random() * validPrimaryTraits.length)];
-
-                const shuffledSecondary = validSecondaryTraits.sort(() => 0.5 - Math.random());
-                const secondaryTrait1 = shuffledSecondary[0];
-                const secondaryTrait2 = shuffledSecondary[1];
-
-                const primaryValue = answers[primaryTrait];
-                const secondaryValue1 = answers[secondaryTrait1];
-                const secondaryValue2 = answers[secondaryTrait2];
-
-                const primaryQuestion = findQuestion(primaryTrait as string);
-                const secondaryQuestion1 = findQuestion(secondaryTrait1 as string);
-                const secondaryQuestion2 = findQuestion(secondaryTrait2 as string);
-
-                if (!primaryQuestion || !secondaryQuestion1 || !secondaryQuestion2) {
-                    setDescription("טקסט תיאור הפרח יוצג כאן...");
-                    return;
-                }
-
-                // FIX: Use the new display name mapping
-                const primaryTraitDisplay = traitDisplayNames[primaryTrait as string] || primaryQuestion.label;
-                const secondaryTrait1Display = traitDisplayNames[secondaryTrait1 as string] || secondaryQuestion1.label;
-                const secondaryTrait2Display = traitDisplayNames[secondaryTrait2 as string] || secondaryQuestion2.label;
-
-                const primaryDisplay = getDisplayValue(primaryQuestion, primaryValue as string);
-                const secondaryDisplay1 = getDisplayValue(secondaryQuestion1, secondaryValue1 as string);
-                const secondaryDisplay2 = getDisplayValue(secondaryQuestion2, secondaryValue2 as string);
-
-                const totalWithPrimaryTrait = allFlowers.filter(flower => flower[primaryTrait] === primaryValue).length;
-                const matchingSubset = allFlowers.filter(flower =>
-                    flower[primaryTrait] === primaryValue &&
-                    flower[secondaryTrait1] === secondaryValue1 &&
-                    flower[secondaryTrait2] === secondaryValue2
-                ).length;
-
-                let finalSentence = '';
-                if (matchingSubset <= 1) {
-                    if (totalWithPrimaryTrait <= 1) {
-                        finalSentence = `את/ה היחיד/ה עם ${primaryTraitDisplay} של ${primaryDisplay} וגם היחיד/ה שאוהב/ת ${secondaryTrait1Display} (${secondaryDisplay1}) ו${secondaryTrait2Display} (${secondaryDisplay2}).`;
-                    } else {
-                        finalSentence = `מבין ${totalWithPrimaryTrait} אנשים עם ${primaryTraitDisplay} של ${primaryDisplay}, את/ה היחיד/ה שאוהב/ת גם ${secondaryTrait1Display} (${secondaryDisplay1}) וגם ${secondaryTrait2Display} (${secondaryDisplay2}).`;
+                const checkCombination = (traits: (keyof Answers)[]) => {
+                    if (traits.length === 0) return 0;
+                    return allOtherFlowers.filter(flower => {
+                        return traits.every(trait => flower[trait] === answers[trait]);
+                    }).length;
+                };
+                
+                if (shuffledTraits.length >= 3) {
+                    const combination = shuffledTraits.slice(0, 3);
+                    const count = checkCombination(combination);
+                    if (count > 0) {
+                        bestCombination = combination;
+                        bestMatchCount = count;
                     }
-                } else {
-                    finalSentence = `מבין ${totalWithPrimaryTrait} אנשים עם ${primaryTraitDisplay} של ${primaryDisplay}, את/ה אחד/ת מתוך ${matchingSubset} שחולקים אהבה ל${secondaryTrait1Display} (${secondaryDisplay1}) וגם ל${secondaryTrait2Display} (${secondaryDisplay2}).`;
+                }
+                
+                if (bestCombination.length === 0 && shuffledTraits.length >= 2) {
+                     const combination = shuffledTraits.slice(0, 2);
+                     const count = checkCombination(combination);
+                     if (count > 0) {
+                         bestCombination = combination;
+                         bestMatchCount = count;
+                     }
+                }
+                
+                 if (bestCombination.length === 0 && shuffledTraits.length >= 1) {
+                     const combination = shuffledTraits.slice(0, 1);
+                     const count = checkCombination(combination);
+                     if (count > 0) {
+                         bestCombination = combination;
+                         bestMatchCount = count;
+                     }
                 }
 
-                setDescription(finalSentence);
+                if (bestCombination.length > 0) {
+                    const gender = (answers.genderIdentity as string) || 'default';
+                    const terms = genderedTerms[gender] || genderedTerms.default;
+
+                    const descriptivePhrases = bestCombination.map(trait => {
+                        const question = findQuestion(trait as string)!;
+                        const value = answers[trait] as string;
+                        const valueDisplay = getDisplayValue(question, value);
+                        
+                        if (trait.toString().includes('origin')) {
+                            return `מוצא מ${valueDisplay}`;
+                        }
+                        if (trait === 'favoriteCuisine') {
+                            return `חיבה למטבח ${valueDisplay}`;
+                        }
+                        if (trait === 'countryToLive') {
+                            return `רצון לגור ב${valueDisplay}`;
+                        }
+                        if (trait === 'politicalView') {
+                            const baseAdjective = politicalAdjectives[value] || value;
+                            const finalAdjective = baseAdjective.endsWith('י') 
+                                ? baseAdjective.slice(0, -1) + terms.adjectiveSuffix 
+                                : baseAdjective;
+                            return `השקפה פוליטית ${finalAdjective}`;
+                        }
+                        return valueDisplay;
+                    });
+
+                    const uniquePhrases = [...new Set(descriptivePhrases)];
+                    const traitsDescription = uniquePhrases.join(' ,').replace(/,([^,]*)$/, 'ו$1');
+
+                    const totalMatches = bestMatchCount + 1;
+                    
+                    let finalSentence = '';
+                    
+                    // FIX: Improved sentence structure for single vs. multiple traits
+                    if (uniquePhrases.length === 1) {
+                        const singleTraitDescription = uniquePhrases[0];
+                         if (totalMatches === 1) {
+                            finalSentence = `${terms.pronoun} ${terms.unique} עם ${singleTraitDescription}`;
+                        } else {
+                            finalSentence = `${terms.pronoun} ${terms.sharing} מתוך ${totalMatches} עם ${singleTraitDescription}`;
+                        }
+                    } else {
+                        // FIX: Use ', ' joiner for correct Hebrew comma spacing
+                        const traitsDescription = uniquePhrases.join(',').replace(/,([^,]*)$/, ' ו$1');
+                        if (totalMatches === 1) {
+                           finalSentence = `${terms.pronoun} ${terms.unique} עם השילוב של ${traitsDescription}`;
+                        } else {
+                            finalSentence = `${terms.pronoun} ${terms.sharing} מתוך ${totalMatches} שחולקים את השילוב של ${traitsDescription}`;
+                        }
+                    }
+                    setDescription(finalSentence);
+                } else {
+                    setDescription('הפרח שלך ייחודי בדרכו שלו, לא מצאנו שילובים דומים במאגר!');
+                }
+
 
             } catch (error) {
                 console.error("Error generating stats: ", error);
@@ -132,6 +201,8 @@ export const ResultScreen = () => {
 
         generateStats();
     }, [answers]);
+
+
 
     const handleStartOver = () => {
         navigate('/form');
