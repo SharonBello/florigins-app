@@ -404,7 +404,7 @@ export const FormScreen: React.FC = (): ReactElement => {
                     <hr className="form-border" />
                 </header>
                 <div ref={displayRef} className="flower-display-wrapper">
-                    <Flower answers={answers} viewBox="-100 -20 390 390" />
+                    <Flower answers={answers} viewBox="-100 -90 390 390" />
                     <div className="form-footer-container screen-only">
                         <hr className="form-border" />
                     </div>
