@@ -20,11 +20,12 @@
   .gallery-header {
     padding-bottom: 1rem;
     margin-bottom: 2rem;
+
     hr {
       border: 0;
-      border-top: 1px solid $border-color;
-      opacity: 0.3;
+      border-top: 1px solid rgba($border-color, 0.3);
     }
+    
     .app-name {
       text-align: left;
       letter-spacing: 0.2em;
@@ -65,7 +66,7 @@
 .gallery-filter-panel {
   grid-area: filter-panel;
   background: $background-color;
-  border-left: 1px solid $border-color;
+  border-left: 1px solid rgba($border-color, 0.3);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -100,7 +101,7 @@
       transition: color 0.2s;
       background: none;
       border: none;
-      border-left: 1px solid $border-color;
+      border-left: 1px solid rgba($border-color, 0.3);
       height: 100%;
       padding: 0;
       font-family: $main-font;
@@ -136,8 +137,7 @@
 
   hr {
     border: 0;
-    border-top: 1px solid $border-color;
-    opacity: 0.3;
+    border-top: 1px solid rgba($border-color, 0.3);
     width: 100%;
   }
 
@@ -170,7 +170,7 @@
 
     .filter-label-item {
       height: 100%;
-      border-bottom: 1px solid $border-color;
+      border-bottom: 1px solid rgba($border-color, 0.3);
       min-width: 0;
       display: flex;
       flex-direction: column;
@@ -205,7 +205,7 @@
   .filter-section {
     flex: 1;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid rgba($border-color, 0.3);
 
     .filter-title {
       font-family: $main-font;

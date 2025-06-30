@@ -134,7 +134,6 @@
 
 .results-border {
     border: 0;
-    border-top: 1px solid $border-color;
-    opacity: 0.3;
+    border-top: 1px solid rgba($border-color, 0.3);
     width: 100%;
 }
