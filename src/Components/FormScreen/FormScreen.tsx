@@ -308,7 +308,6 @@ export const FormScreen: React.FC = (): ReactElement => {
                         return (
                             <React.Fragment key={id}>
                                 <div className={`${arr[index]}`}>
-                                    {/* <h3 className="question-label">{question.label}</h3> */}
                                     <FormStep question={question} value={answers[id]} onChange={(v) => handleAnswerChange(id, v)} showLabel={true} />
                                 </div>
                                 {index < arr.length - 1 && <hr className="section-divider" />}

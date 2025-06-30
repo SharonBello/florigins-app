@@ -176,18 +176,19 @@
 
     .reset-form-button {
       background-color: $onSelect-Color;
-      color: white;
+      color: black;
       border-radius: 9999px !important;
       padding: 0.75rem 2.5rem !important;
       font-family: $main-font !important;
       width: 12rem;
       transition:
-        background-color 0.3s,
-        opacity 0.3s;
+      background-color 0.3s,
+      opacity 0.3s;
       cursor: pointer;
-
+      
       &:hover {
         background: color.scale($button-background-color, $lightness: -80%);
+        color: white;
       }
 
       @media (min-width: 800px) and (max-width: 1800px) {
@@ -217,25 +218,26 @@
 
       .print-button {
         background-color: $onSelect-Color;
-        color: white;
+        color: black;
         border-radius: 9999px !important;
         padding: 0.75rem 2.5rem !important;
         font-family: $main-font !important;
         transition:
-          background-color 0.3s,
-          opacity 0.3s;
+        background-color 0.3s,
+        opacity 0.3s;
         cursor: pointer;
         width: 12rem;
-
+        
         &:disabled {
           background: color.scale($button-background-color, $lightness: -10%);
-
+          
           opacity: 0.7;
           cursor: not-allowed;
         }
-
+        
         &:hover {
           background: color.scale($button-background-color, $lightness: -80%);
+          color: white;
         }
 
         @media (min-width: 800px) and (max-width: 1800px) {
@@ -349,13 +351,23 @@
 
 .form-legacy-country-section {
   padding: 0.5rem 2rem;
-  margin-block: 0 1rem;
+  margin-block: 0.75rem 1rem;
 
   .form-step-container {
-    display: flex;
+    // display: flex;
+    // gap: 1rem;
+    // align-items: center;
+    // justify-content: right;
+    display: grid;
+    grid-template-columns: 40% auto;
     gap: 1rem;
     align-items: center;
-    justify-content: right;
+    justify-content: flex-start;
+
+    @media (min-width: 800px) and (max-width: 1800px) {
+      grid-template-columns: 55% auto;
+      font-size: 0.9rem;
+    }
 
     .question-label {
       display: block;
@@ -379,16 +391,16 @@
         border: none;
         font-size: 1rem;
         padding: 4px 12px;
-        margin-bottom: 0.75rem;
+        margin-bottom: 1rem;
         flex: 0.7;
         appearance: unset;
         font-family: $main-font;
         font-weight: $font-weight-light;
+        width: 18rem;
 
         @media (min-width: 800px) and (max-width: 1800px) {
           font-size: 0.9rem;
-          flex: 0.3;
-          min-inline-size: 9rem !important;
+          width: 10rem;
         }
 
         &:active,
@@ -495,19 +507,26 @@
 .favoriteCuisine,
 .cultureToBelong {
   padding: 0.5rem 2rem;
-  margin-block: 0 1rem;
+  margin-block: 0.75rem 1rem;
 
   .form-step-container {
-    display: flex;
+    display: grid;
+    grid-template-columns: 40% auto;
     gap: 1rem;
     align-items: center;
-    justify-content: right;
+    justify-content: flex-start;
+
+    @media (min-width: 800px) and (max-width: 1800px) {
+      grid-template-columns: 51% auto;
+      font-size: 0.9rem;
+    }
 
     .question-label {
-      display: block;
+      grid-column: 1;
+      text-align: right;
       font-size: 1rem;
       color: $text-color;
-      text-wrap: nowrap;
+      white-space: nowrap;
       font-family: $main-font;
       font-weight: $font-weight-light;
 
@@ -517,21 +536,23 @@
     }
 
     .custom-select-wrapper {
+      grid-column: 2;
       display: flex;
+      justify-content: flex-end;
+
       .input-underline {
         border-radius: 25px;
         border: none;
         font-size: 1rem;
         padding: 4px 12px;
-        flex: 0.7;
-        appearance: unset;
+        appearance: none;
         font-family: $main-font;
         font-weight: $font-weight-light;
+        width: 18rem;
 
         @media (min-width: 800px) and (max-width: 1800px) {
           font-size: 0.9rem;
-          flex: 0.3;
-          min-inline-size: 10.5rem !important;
+          width: 10.5rem;
         }
 
         &:active,

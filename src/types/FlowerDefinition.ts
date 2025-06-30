@@ -5,8 +5,6 @@ export interface FlowerDefinition {
   countryHebrew: string;
   continent: string;
   continentHebrew: string;
-  scientificName: string;
-  scientificNameHebrew: string;
   gradientStops: string[];
 }
 
