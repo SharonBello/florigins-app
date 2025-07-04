@@ -107,7 +107,8 @@ export const FormScreen: React.FC = (): ReactElement => {
                 const pdf = new jsPDF({
                     orientation: 'landscape',
                     unit: 'mm',
-                    format: 'a4',
+                    // format: 'a4',
+                    format: [148, 100],
                 });
                 const pdfW: number = pdf.internal.pageSize.getWidth();
                 const pdfH: number = pdf.internal.pageSize.getHeight();
