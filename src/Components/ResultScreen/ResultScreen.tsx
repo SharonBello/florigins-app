@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { Flower } from '../Flower/Flower';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ShareIcon from '@mui/icons-material/Share';
 import './ResultScreen.scss'
 import type { Question } from '../../types/Question';
@@ -20,13 +20,13 @@ const genderedTerms: Record<string, { pronoun: string; unique: string; sharing: 
     'default': { pronoun: 'את/ה', unique: 'היחיד/ה', sharing: 'אחד/ת', adjectiveSuffix: 'ת' }
 };
 
-const politicalAdjectives: Record<string, string> = {
-    'ימין': 'ימנית',
-    'ימין מרכז': 'ימין-מרכז',
-    'מרכז': 'מרכזית',
-    'שמאל מרכז': 'שמאל-מרכז',
-    'שמאל': 'שמאלנית',
-};
+// const politicalAdjectives: Record<string, string> = {
+//     'ימין': 'ימנית',
+//     'ימין מרכז': 'ימין-מרכז',
+//     'מרכז': 'מרכזית',
+//     'שמאל מרכז': 'שמאל-מרכז',
+//     'שמאל': 'שמאלנית',
+// };
 
 function getCombinations<T>(arr: T[], size: number): T[][] {
     const result: T[][] = [];
@@ -55,7 +55,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 export const ResultScreen = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const answers = location.state?.answers || {};
+    const answers = useMemo(() => location.state?.answers || {}, [location.state?.answers]);
     const flowerRef = useRef<HTMLDivElement>(null);
     const [description, setDescription] = useState('...טוען נתונים סטטיסטיים');
 
@@ -103,7 +103,7 @@ export const ResultScreen = () => {
 
                 const possibleTraits: (keyof Answers)[] = [
                     'origin_p1_grandpa', 'origin_p1_grandma', 'origin_p2_grandpa', 'origin_p2_grandma',
-                    'childhoodEnvironment', 'favoriteCuisine', 'countryToLive', 'politicalView', 'diet', 'religion'
+                    'favoriteCuisine', 'countryToLive', 'diet'
                 ];
 
                 const validUserTraits = possibleTraits.filter(trait => answers[trait]);
@@ -155,13 +155,6 @@ export const ResultScreen = () => {
                         if (trait === 'countryToLive') {
                             return `רצון לגור ב${valueDisplay}`;
                         }
-                        if (trait === 'politicalView') {
-                            const baseAdjective = politicalAdjectives[value] || value;
-                            const finalAdjective = baseAdjective.endsWith('י')
-                                ? baseAdjective.slice(0, -1) + terms.adjectiveSuffix
-                                : baseAdjective;
-                            return `השקפה פוליטית ${finalAdjective}`;
-                        }
                         return valueDisplay;
                     });
 
@@ -178,7 +171,6 @@ export const ResultScreen = () => {
                             finalSentence = `${terms.pronoun} ${terms.sharing} מתוך ${totalMatches} עם ${singleTraitDescription}.`;
                         }
                     } else {
-                        // FIX: Manually construct the list string for perfect Hebrew grammar
                         const allButLast = uniquePhrases.slice(0, -1).join(', ');
                         const last = uniquePhrases.slice(-1)[0];
                         const traitsDescription = `${allButLast} ו${last}`;

@@ -3,7 +3,6 @@ import { Button, Typography } from '@mui/material';
 import './HomeScreen.scss';
 import { useEffect, useState } from 'react';
 import { HomePageFlowerIcon } from '../../assets/icons/HomePageFlowerIcon';
-// import homePageGif from '../../assets/icons/homePageGif.gif';
 import homePageVideo from '../../assets/icons/homePageVideo2.mp4';
 
 export const HomeScreen = () => {
@@ -51,7 +50,6 @@ export const HomeScreen = () => {
 
             <main className="main-content">
                 <div className="homepage-flower-container">
-                    {/* <img src={homePageGif} alt="homePageGif" /> */}
                     <video
                         className="homepage-video"
                         src={homePageVideo}
