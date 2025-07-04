@@ -1,5 +1,5 @@
 import React, { forwardRef, useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom'
 import { flowerDefinitions, questions } from '../../data/appData';
 import type { Answers } from '../../types/Answers';
 import { Flower } from '../Flower/Flower';
@@ -16,6 +16,10 @@ import { collection, addDoc } from 'firebase/firestore';
 interface PrintableFlowerProps {
     answers: Answers;
     summary: string;
+}
+
+type LocationState = {
+    answers?: Answers
 }
 
 const PrintableFlower = forwardRef<HTMLDivElement, PrintableFlowerProps>(
@@ -41,10 +45,18 @@ PrintableFlower.displayName = 'PrintableFlower';
 
 export const FormScreen: React.FC = (): ReactElement => {
     const navigate = useNavigate();
-    const [answers, setAnswers] = useState<Answers>({});
+    const location = useLocation()
+    const state = (location.state as LocationState) ?? {}
+    const [answers, setAnswers] = useState<Answers>(state.answers ?? {})
     const [isPrinting, setIsPrinting] = useState<boolean>(false);
     const printableRef = useRef<HTMLDivElement>(null);
     const displayRef = useRef<HTMLDivElement>(null);
+
+    useEffect((): void => {
+        if (state.answers) {
+            setAnswers(state.answers)
+        }
+    }, [state.answers])
 
     const summaryString: string = questions.map((q): string | null => {
         if (q.id === 'name' || q.id === 'belonging') return null;

@@ -180,10 +180,10 @@
       font-family: $main-font !important;
       width: 12rem;
       transition:
-      background-color 0.3s,
-      opacity 0.3s;
+        background-color 0.3s,
+        opacity 0.3s;
       cursor: pointer;
-      
+
       &:hover {
         background: color.scale($button-background-color, $lightness: -80%);
         color: white;
@@ -221,18 +221,18 @@
         padding: 0.75rem 2.5rem !important;
         font-family: $main-font !important;
         transition:
-        background-color 0.3s,
-        opacity 0.3s;
+          background-color 0.3s,
+          opacity 0.3s;
         cursor: pointer;
         width: 12rem;
-        
+
         &:disabled {
           background: color.scale($button-background-color, $lightness: -10%);
-          
+
           opacity: 0.7;
           cursor: not-allowed;
         }
-        
+
         &:hover {
           background: color.scale($button-background-color, $lightness: -80%);
           color: white;
@@ -479,6 +479,7 @@
           left: 0;
           padding-left: 1rem;
         }
+
         &--max {
           right: 0;
           padding-right: 1rem;
@@ -538,6 +539,10 @@
       display: flex;
       justify-content: flex-end;
 
+      @media (min-width: 1600px) and (max-width: 2100px) {
+        margin-right: 2rem;
+      }
+
       .input-underline {
         border-radius: 25px;
         border: none;
@@ -547,6 +552,10 @@
         font-family: $main-font;
         font-weight: $font-weight-light;
         width: 18rem;
+        
+        @media (min-width: 1600px) and (max-width: 2100px) {
+          width: 13rem;
+        }
 
         @media (min-width: 800px) and (max-width: 1800px) {
           font-size: 0.9rem;

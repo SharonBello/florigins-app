@@ -43,7 +43,7 @@ export const GalleryScreen: React.FC = () => {
 
             flowersFromDb.forEach(flower => {
                 const flowerDataForSignature = { ...flower };
-                delete (flowerDataForSignature as any).id;
+                delete (flowerDataForSignature).id;
 
                 const signature = JSON.stringify(flowerDataForSignature);
 
@@ -154,8 +154,8 @@ export const GalleryScreen: React.FC = () => {
 
     }, [allFlowers, groupByKey]);
 
-    const handleFlowerClick = (answers: Answers) => {
-        navigate('/results', { state: { answers } });
+    const handleFlowerClick = (flowerAnswers: Answers): void => {
+       navigate('/form', { state: { answers: flowerAnswers } })
     };
 
     const handleBack = () => {
