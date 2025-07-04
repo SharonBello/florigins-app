@@ -25,7 +25,7 @@
       border: 0;
       border-top: 1px solid rgba($border-color, 0.3);
     }
-    
+
     .app-name {
       text-align: left;
       letter-spacing: 0.2em;
@@ -44,6 +44,8 @@
     cursor: pointer;
     text-align: center;
     transition: transform 0.2s ease-out;
+    transform-origin: center center;
+
     &:hover {
       transform: translateY(-5px);
     }
@@ -214,6 +216,7 @@
       text-align: right;
       font-size: 1.1rem;
     }
+
     .filter-options {
       display: flex;
       flex-wrap: wrap;
@@ -221,10 +224,12 @@
     }
 
     .filter-select-container {
+
       .MuiInput-underline:before,
       .MuiInput-underline:after {
         border-bottom: none;
       }
+
       .filter-select {
         background-color: #fff;
         border-radius: 4px;
@@ -285,12 +290,15 @@
       @media (max-width: 1200px) {
         transform: scale(0.8);
       }
+
       @media (max-width: 992px) {
         transform: scale(0.65);
       }
+
       @media (max-width: 768px) {
         transform: scale(0.5);
       }
+
       @media (max-width: 576px) {
         transform: scale(0.4);
       }
@@ -300,6 +308,9 @@
       position: absolute;
       top: 0;
       left: 0;
+      transition: transform 0.3s ease-out;
+      transform-origin: center center;
+
       &:not(:first-child) {
         margin-right: 0;
       }
@@ -319,18 +330,23 @@
   @media (max-width: 1800px) {
     transform: scale(0.9);
   }
+
   @media (max-width: 1400px) {
     transform: scale(0.85);
   }
+
   @media (max-width: 1200px) {
     transform: scale(0.8);
   }
+
   @media (max-width: 992px) {
     transform: scale(0.65);
   }
+
   @media (max-width: 768px) {
     transform: scale(0.5);
   }
+
   @media (max-width: 576px) {
     transform: scale(0.4);
   }
@@ -342,11 +358,9 @@
   height: 250px;
   position: relative;
   z-index: 1;
-  transition:
-    transform 0.3s ease-out,
-    z-index 0s 0.3s;
-  transform-origin: center bottom;
   margin-bottom: -130px;
+  transition: transform 0.3s ease-out;
+  transform-origin: center center;
 
   &:not(:first-child) {
     margin-right: -90px;
