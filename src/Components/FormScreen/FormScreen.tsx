@@ -51,12 +51,22 @@ export const FormScreen: React.FC = (): ReactElement => {
     const [isPrinting, setIsPrinting] = useState<boolean>(false);
     const printableRef = useRef<HTMLDivElement>(null);
     const displayRef = useRef<HTMLDivElement>(null);
+    const fromGallery = Boolean(state.answers);
+    const backLabel: string = fromGallery ? 'למאגר' : 'חזרה';
 
     useEffect((): void => {
         if (state.answers) {
             setAnswers(state.answers)
         }
     }, [state.answers])
+
+    const handleBack = (): void => {
+        if (fromGallery) {
+            navigate('/gallery');
+        } else {
+            navigate('/');
+        }
+    };
 
     const summaryString: string = questions.map((q): string | null => {
         if (q.id === 'name' || q.id === 'belonging') return null;
@@ -173,10 +183,6 @@ export const FormScreen: React.FC = (): ReactElement => {
         }
     };
 
-    const handleBack = (): void => {
-        navigate('/');
-    };
-
     const handleReset = (): void => {
         setAnswers({});
     };
@@ -273,8 +279,12 @@ export const FormScreen: React.FC = (): ReactElement => {
                 <section className="form-header">
                     <div onClick={handleBack} className="back-button">
                         <article className="back-icon-container">
-                            <span>חזרה</span>
-                            <IconButton className="back-icon-button" size="small" aria-label="back">
+                            <span>{backLabel}</span>
+                            <IconButton
+                                className="back-icon-button"
+                                size="small"
+                                aria-label={fromGallery ? 'back to gallery' : 'back to home'}
+                            >
                                 <ArrowBackIcon />
                             </IconButton>
                         </article>

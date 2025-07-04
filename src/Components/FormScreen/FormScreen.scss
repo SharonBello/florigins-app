@@ -384,6 +384,10 @@
     .custom-select-wrapper {
       display: flex;
 
+      @media (min-width: 1600px) and (max-width: 2100px) {
+        margin-right: 2.2rem;
+      }
+
       .input-underline {
         border-radius: 25px;
         border: none;
@@ -396,9 +400,13 @@
         font-weight: $font-weight-light;
         width: 18rem;
 
+        @media (min-width: 1600px) and (max-width: 2100px) {
+          width: 13rem;
+        }
+
         @media (min-width: 800px) and (max-width: 1800px) {
           font-size: 0.9rem;
-          width: 10rem;
+          width: 10.5rem;
         }
 
         &:active,
@@ -552,7 +560,7 @@
         font-family: $main-font;
         font-weight: $font-weight-light;
         width: 18rem;
-        
+
         @media (min-width: 1600px) and (max-width: 2100px) {
           width: 13rem;
         }
