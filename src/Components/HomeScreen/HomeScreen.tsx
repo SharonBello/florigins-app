@@ -2,8 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Typography } from '@mui/material';
 import './HomeScreen.scss';
 import { useEffect, useState } from 'react';
-import { HomePageFlowerIcon } from '../../assets/icons/HomePageFlowerIcon';
-import homePageVideo from '../../assets/icons/homePageVideo2.mp4';
+import homePageVideo from '../../assets/icons/homePageVideo.mp4';
 
 export const HomeScreen = () => {
     const navigate = useNavigate();
@@ -32,7 +31,14 @@ export const HomeScreen = () => {
         return (
             <div className="mobile-blocker-container" dir="rtl">
                 <div className="homepage-flower-container">
-                    <HomePageFlowerIcon />
+                    <video
+                        className="homepage-video"
+                        src={homePageVideo}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                    />
                 </div>
                 <Typography className="mobile-blocker-message">
                     יש לפתוח את האפליקציה במחשב
