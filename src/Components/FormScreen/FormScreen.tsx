@@ -28,7 +28,7 @@ const PrintableFlower = forwardRef<HTMLDivElement, PrintableFlowerProps>(
                 <Typography dir="ltr">Florigins</Typography>
             </header>
             <div className="print-flower-container">
-                <Flower answers={answers} viewBox="-50 -50 360 360" />
+                <Flower answers={answers} viewBox="-40 -60 380 360" />
             </div>
             <footer className="print-footer">
                 <Typography className="summary-text">{summary}</Typography>
@@ -90,6 +90,10 @@ export const FormScreen: React.FC = (): ReactElement => {
                 scale: 1,
                 useCORS: true,
                 backgroundColor: null,
+                width: printableRef.current!.scrollWidth,        // full content width
+                height: printableRef.current!.scrollHeight,      // full content height
+                scrollX: 0,
+                scrollY: 0,
             }).then((canvas) => {
                 const imgData: string = canvas.toDataURL('image/png');
                 const pdf = new jsPDF({
@@ -97,27 +101,19 @@ export const FormScreen: React.FC = (): ReactElement => {
                     unit: 'mm',
                     format: 'a4',
                 });
-                const pdfW: number = pdf.internal.pageSize.getWidth();
-                const pdfH: number = pdf.internal.pageSize.getHeight();
+                const pdfW = pdf.internal.pageSize.getWidth();
+                const pdfH = pdf.internal.pageSize.getHeight();
                 pdf.setFillColor('#F7F0E6');
                 pdf.rect(0, 0, pdfW, pdfH, 'F');
 
-                const ratio: number = canvas.width / canvas.height;
-                const margin: number = 15;
-                const maxW: number = pdfW - margin * 2;
-                const maxH: number = pdfH - margin * 2;
-                let finalW: number, finalH: number;
-
-                if (ratio > maxW / maxH) {
-                    finalW = maxW;
-                    finalH = maxW / ratio;
-                } else {
-                    finalH = maxH;
-                    finalW = maxH * ratio;
-                }
-
-                const x: number = (pdfW - finalW) / 2;
-                const y: number = (pdfH - finalH) / 2;
+                const ratio = canvas.width / canvas.height;
+                const margin = 15;
+                const maxW = pdfW - margin * 2;
+                const maxH = pdfH - margin * 2;
+                let finalW = ratio > maxW / maxH ? maxW : maxH * ratio;
+                let finalH = ratio > maxW / maxH ? maxW / ratio : maxH;
+                const x = (pdfW - finalW) / 2;
+                const y = (pdfH - finalH) / 2;
                 pdf.addImage(imgData, 'PNG', x, y, finalW, finalH);
 
                 const blob = pdf.output('blob');
@@ -189,20 +185,22 @@ export const FormScreen: React.FC = (): ReactElement => {
                     position: absolute;
                     left: -9999px;
                     top: 0;
-                    width: 1123px;
-                    height: 794px;
+                    width: 297mm;
+                    height: 210mm;
+                    overflow: visible; 
                 }
 
                 .print-layout {
-                    width: 100%;
-                    height: 100%;
+                    width: 297mm;
+                    min-height: 210mm;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
                     align-items: center;
-                    padding: 1rem;
+                    padding: 15mm;
                     box-sizing: border-box;
                     background-color: #F7F0E6;
+                    overflow: visible;
                 }
 
                 .print-header {
@@ -227,8 +225,8 @@ export const FormScreen: React.FC = (): ReactElement => {
                 }
 
                 .print-flower-container svg {
-                    max-width: 100%;
-                    max-height: 100%;
+                    width: 100%;
+                    height: 100%;
                 }
 
                 .print-footer {
