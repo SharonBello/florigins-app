@@ -29,6 +29,7 @@ export const GalleryScreen: React.FC = () => {
     const navigate = useNavigate();
     const [allFlowers, setAllFlowers] = useState<Answers[]>([]);
     const [groupByKey, setGroupByKey] = useState<keyof Answers | null>(null);
+    const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
     useEffect(() => {
         const flowersCollectionRef = collection(db, "submittedFlowers");
@@ -43,7 +44,7 @@ export const GalleryScreen: React.FC = () => {
 
             flowersFromDb.forEach(flower => {
                 const flowerDataForSignature = { ...flower };
-                delete (flowerDataForSignature as any).id;
+                delete (flowerDataForSignature).id;
 
                 const signature = JSON.stringify(flowerDataForSignature);
 
@@ -154,8 +155,8 @@ export const GalleryScreen: React.FC = () => {
 
     }, [allFlowers, groupByKey]);
 
-    const handleFlowerClick = (answers: Answers) => {
-        navigate('/results', { state: { answers } });
+    const handleFlowerClick = (flowerAnswers: Answers): void => {
+        navigate('/form', { state: { answers: flowerAnswers } })
     };
 
     const handleBack = () => {
@@ -183,32 +184,71 @@ export const GalleryScreen: React.FC = () => {
                             )}
                             <div className="gallery-bunch-container">
                                 {flowersInGroup.map((flowerAnswers, index) => {
-                                    const isUnfiltered = !groupByKey;
-                                    const style: React.CSSProperties = {};
+                                    const isUnfiltered: boolean = !groupByKey
+                                    const angle: number = (index / flowersInGroup.length) * 2 * Math.PI
+                                    const baseRadius: number = Math.pow(Math.random(), 0.4) * Math.min(flowersInGroup.length * 18, 290)
+
+                                    // only use push logic when unfiltered
+                                    let transform: string
+                                    let zIndexVal: number
+                                    let transitionVal: string
 
                                     if (isUnfiltered) {
-                                        const angle = (index / flowersInGroup.length) * 2 * Math.PI;
-                                        const radius = Math.pow(Math.random(), 0.4) * Math.min(flowersInGroup.length * 12, 220);
-                                        const x = Math.cos(angle) * radius;
-                                        const y = Math.sin(angle) * radius;
-                                        style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${(Math.random() - 0.5) * 30}deg)`;
-                                        style.zIndex = index;
+                                        // --- neighbor‐push parameters ---
+                                        const pushFactor: number = 1.4    // how far immediate neighbors move
+                                        const defaultFactor: number = 1.0 // others stay at baseRadius
+
+                                        const radius: number = hoveredIndex === null
+                                            ? baseRadius
+                                            : hoveredIndex === index
+                                                ? baseRadius
+                                                : Math.abs(index - hoveredIndex) <= 1
+                                                    ? baseRadius * pushFactor   // only direct neighbors get pushed
+                                                    : baseRadius * defaultFactor
+
+                                        const x: number = Math.cos(angle) * radius
+                                        const y: number = Math.sin(angle) * radius
+                                        const rotation: number = (Math.random() - 0.6) * 30
+
+                                        transform = `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${rotation}deg)`
+
+                                        // scale hovered one
+                                        if (hoveredIndex === index) {
+                                            transform += ' scale(1.6)'
+                                        }
+
+                                        zIndexVal = hoveredIndex === index ? 1000 : 1
+                                        transitionVal = 'transform 0.3s ease-out'
+
                                     } else {
-                                        style.transform = `translateY(${index % 2 === 0 ? '-20px' : '10px'})`;
-                                        style.transition = 'transform 0.8s';
-                                        style.zIndex = 10 + (flowersInGroup.length - index);
+                                        // grouped mode: keep your translateY logic
+                                        transform = `translateY(${index % 2 === 0 ? '-20px' : '10px'})`
+                                        zIndexVal = 10 + (flowersInGroup.length - index)
+                                        transitionVal = 'transform 0.8s ease-out'
+                                    }
+
+                                    const style: React.CSSProperties = {
+                                        position: isUnfiltered ? 'absolute' : undefined,
+                                        top: isUnfiltered ? 0 : undefined,
+                                        left: isUnfiltered ? 0 : undefined,
+                                        transform,
+                                        zIndex: zIndexVal,
+                                        transition: transitionVal,
+                                        transformOrigin: 'center center',
                                     }
 
                                     return (
                                         <div
-                                            key={`${flowerAnswers.id || index}-${groupName}`}
+                                            key={flowerAnswers.id ?? index}
                                             className="gallery-item"
                                             style={style}
+                                            onMouseEnter={() => setHoveredIndex(index)}
+                                            onMouseLeave={() => setHoveredIndex(null)}
                                             onClick={() => handleFlowerClick(flowerAnswers)}
                                         >
                                             <Flower answers={flowerAnswers} viewBox="-20 -20 250 250" showTooltip={false} />
                                         </div>
-                                    );
+                                    )
                                 })}
                             </div>
                         </div>
