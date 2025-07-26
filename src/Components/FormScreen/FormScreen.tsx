@@ -120,9 +120,8 @@ export const FormScreen: React.FC = (): ReactElement => {
                 const imgData: string = canvas.toDataURL('image/png');
                 const pdf = new jsPDF({
                     orientation: 'landscape',
-                    unit: 'mm',
-                    // format: 'a4',
-                    format: [148, 100],
+                    unit: 'mm', 
+                    format: [297, 210],
                 });
                 const pdfW = pdf.internal.pageSize.getWidth();
                 const pdfH = pdf.internal.pageSize.getHeight();
