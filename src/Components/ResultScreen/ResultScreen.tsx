@@ -557,7 +557,6 @@ export const ResultScreen = () => {
                 .print-footer {
                     width: 100%;
                     padding-top: 0.5rem;
-                    border-top: 1px solid #ccc;
                     text-align: center;
                     margin-top: 1rem;
                 }
