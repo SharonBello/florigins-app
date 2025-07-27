@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
+import React, { forwardRef, useEffect, useRef, useState, type ReactElement } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom'
 import { flowerDefinitions, questions } from '../../data/appData';
 import type { Answers } from '../../types/Answers';
@@ -8,8 +8,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Button, IconButton, Typography } from '@mui/material';
 import './FormScreen.scss';
 import type { Question } from '../../types/Question';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import { db } from '../../../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 
@@ -48,7 +46,6 @@ export const FormScreen: React.FC = (): ReactElement => {
     const location = useLocation()
     const state = (location.state as LocationState) ?? {}
     const [answers, setAnswers] = useState<Answers>(state.answers ?? {})
-    const [isPrinting, setIsPrinting] = useState<boolean>(false);
     const printableRef = useRef<HTMLDivElement>(null);
     const displayRef = useRef<HTMLDivElement>(null);
     const fromGallery = Boolean(state.answers);
@@ -93,73 +90,6 @@ export const FormScreen: React.FC = (): ReactElement => {
         return String(ans);
     }).filter((s): s is string => Boolean(s)).join(' * ');
 
-    const generatePdfAndNavigate = useCallback(async (): Promise<void> => {
-        if (!answers.id || !printableRef.current) {
-            setIsPrinting(false);
-            return;
-        }
-
-        const newWindow: Window | null = window.open('', '_blank');
-        if (!newWindow) {
-            alert('Popup blocked! Please allow popups for this site.');
-            setIsPrinting(false);
-            return;
-        }
-        newWindow.document.write('<h1>Generating your flower PDF...</h1>');
-
-        setTimeout((): void => {
-            html2canvas(printableRef.current!, {
-                scale: 1,
-                useCORS: true,
-                backgroundColor: null,
-                width: printableRef.current!.scrollWidth,        // full content width
-                height: printableRef.current!.scrollHeight,      // full content height
-                scrollX: 0,
-                scrollY: 0,
-            }).then((canvas) => {
-                const imgData: string = canvas.toDataURL('image/png');
-                const pdf = new jsPDF({
-                    orientation: 'landscape',
-                    unit: 'mm', 
-                    format: [297, 210],
-                });
-                const pdfW = pdf.internal.pageSize.getWidth();
-                const pdfH = pdf.internal.pageSize.getHeight();
-                pdf.setFillColor('#F7F0E6');
-                pdf.rect(0, 0, pdfW, pdfH, 'F');
-
-                const ratio = canvas.width / canvas.height;
-                const margin = 15;
-                const maxW = pdfW - margin * 2;
-                const maxH = pdfH - margin * 2;
-                let finalW = ratio > maxW / maxH ? maxW : maxH * ratio;
-                let finalH = ratio > maxW / maxH ? maxW / ratio : maxH;
-                const x = (pdfW - finalW) / 2;
-                const y = (pdfH - finalH) / 2;
-                pdf.addImage(imgData, 'PNG', x, y, finalW, finalH);
-
-                const blob = pdf.output('blob');
-                const url = URL.createObjectURL(blob);
-                newWindow.location.href = url;
-                newWindow.document.title = (answers.name as string) || 'Florigins';
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-                navigate('/results', { state: { answers } });
-            }).catch((err) => {
-                console.error('Error generating PDF:', err);
-                newWindow.close();
-            }).finally(() => {
-                setIsPrinting(false);
-            });
-        }, 100);
-    }, [answers, navigate]);
-
-    useEffect((): void => {
-        if (isPrinting) {
-            void generatePdfAndNavigate();
-        }
-    }, [isPrinting, generatePdfAndNavigate]);
-
     const allQuestionsAnswered: boolean = questions.filter((q) => q.id !== 'name' && q.id !== 'belonging').every((q) => {
         const ans = answers[q.id];
         if (typeof ans === 'number') return true;
@@ -167,14 +97,20 @@ export const FormScreen: React.FC = (): ReactElement => {
         return Boolean(ans);
     });
 
-    const handleExportPdf = async (): Promise<void> => {
+    const handleFinishAndNavigate = async (): Promise<void> => {
         if (!allQuestionsAnswered) return;
+
         try {
             const docRef = await addDoc(collection(db, 'submittedFlowers'), answers);
-            setAnswers((prev) => ({ ...prev, id: docRef.id }));
-            setIsPrinting(true);
+            const updatedAnswers = { ...answers, id: docRef.id };
+            navigate('/results', {
+                state: { answers: updatedAnswers },
+                replace: true
+            });
+
         } catch (e) {
             console.error('Error saving flower:', e);
+            alert('שגיאה בשמירת הפרח. אנא נסה שוב.');
         }
     };
 
@@ -405,8 +341,12 @@ export const FormScreen: React.FC = (): ReactElement => {
                             יש למלא את כל השדות כדי להמשיך
                         </Typography>
 
-                        <Button onClick={handleExportPdf} className="print-button" disabled={!allQuestionsAnswered}>
-                            הדפס
+                        <Button
+                            onClick={handleFinishAndNavigate}
+                            className="gotToResults-button"
+                            disabled={!allQuestionsAnswered}
+                        >
+                            סיום
                         </Button>
                     </div>
                 </div>
