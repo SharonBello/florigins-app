@@ -297,7 +297,6 @@ export const ResultScreen = () => {
                             document.body.removeChild(iframe);
                         }, 2000);
                     } catch (e) {
-                        console.log('Iframe print failed:', e);
                         document.body.removeChild(iframe);
                     }
                 }, 800);

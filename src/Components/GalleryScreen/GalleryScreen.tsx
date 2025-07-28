@@ -156,7 +156,7 @@ export const GalleryScreen: React.FC = () => {
     }, [allFlowers, groupByKey]);
 
     const handleFlowerClick = (flowerAnswers: Answers): void => {
-        navigate('/form', { state: { answers: flowerAnswers } })
+        navigate('/form', { state: { answers: flowerAnswers, source: 'gallery' } });
     };
 
     const handleBack = () => {

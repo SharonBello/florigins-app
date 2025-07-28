@@ -17,7 +17,8 @@ interface PrintableFlowerProps {
 }
 
 type LocationState = {
-    answers?: Answers
+    answers?: Answers;
+    source?: 'gallery';
 }
 
 const PrintableFlower = forwardRef<HTMLDivElement, PrintableFlowerProps>(
@@ -48,8 +49,8 @@ export const FormScreen: React.FC = (): ReactElement => {
     const [answers, setAnswers] = useState<Answers>(state.answers ?? {})
     const printableRef = useRef<HTMLDivElement>(null);
     const displayRef = useRef<HTMLDivElement>(null);
-    const fromGallery = Boolean(state.answers);
-    const backLabel: string = fromGallery ? 'למאגר' : 'חזרה';
+    const cameFromGallery = state.source === 'gallery';
+    const backLabel: string = cameFromGallery ? 'למאגר' : 'חזרה';
 
     useEffect((): void => {
         if (state.answers) {
@@ -58,7 +59,7 @@ export const FormScreen: React.FC = (): ReactElement => {
     }, [state.answers])
 
     const handleBack = (): void => {
-        if (fromGallery) {
+        if (cameFromGallery) {
             navigate('/gallery');
         } else {
             navigate('/');
@@ -98,19 +99,27 @@ export const FormScreen: React.FC = (): ReactElement => {
     });
 
     const handleFinishAndNavigate = async (): Promise<void> => {
-        if (!allQuestionsAnswered) return;
-
-        try {
-            const docRef = await addDoc(collection(db, 'submittedFlowers'), answers);
-            const updatedAnswers = { ...answers, id: docRef.id };
+        if (!allQuestionsAnswered && !cameFromGallery) return;
+        if (cameFromGallery) {
+            // SCENARIO 1: Came from Gallery.
             navigate('/results', {
-                state: { answers: updatedAnswers },
+                state: { answers: answers },
                 replace: true
             });
+        } else {
+            // SCENARIO 2: Creating a new flower.
+            try {
+                const docRef = await addDoc(collection(db, 'submittedFlowers'), answers);
+                const updatedAnswers = { ...answers, id: docRef.id };
+                navigate('/results', {
+                    state: { answers: updatedAnswers },
+                    replace: true
+                });
 
-        } catch (e) {
-            console.error('Error saving flower:', e);
-            alert('שגיאה בשמירת הפרח. אנא נסה שוב.');
+            } catch (e) {
+                console.error('Error saving flower:', e);
+                alert('שגיאה בשמירת הפרח. אנא נסה שוב.');
+            }
         }
     };
 
@@ -216,7 +225,7 @@ export const FormScreen: React.FC = (): ReactElement => {
                             <IconButton
                                 className="back-icon-button"
                                 size="small"
-                                aria-label={fromGallery ? 'back to gallery' : 'back to home'}
+                                aria-label={cameFromGallery ? 'back to gallery' : 'back to home'}
                             >
                                 <ArrowBackIcon />
                             </IconButton>
