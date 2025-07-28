@@ -420,12 +420,11 @@ export const ResultScreen = () => {
                     height: 100mm;
                     display: flex;
                     flex-direction: column;
-                    justify-content: space-between;
+                    justify-content: center;
                     align-items: center;
                     padding: 8mm;
                     box-sizing: border-box;
                     background-color: #F7F0E6;
-                    border: 3px solid #000000;
                     overflow: visible;
                 }
 
