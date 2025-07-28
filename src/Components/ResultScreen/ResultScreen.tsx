@@ -78,7 +78,6 @@ export const ResultScreen = () => {
     const flowerRef = useRef<HTMLDivElement>(null);
     const printableRef = useRef<HTMLDivElement>(null);
     const [description, setDescription] = useState('...טוען נתונים סטטיסטיים');
-    // const [isPrinting, setIsPrinting] = useState<boolean>(false);
 
     const findQuestion = (id: string): Question | undefined => {
         return questions.find(q => q.id === id);
@@ -242,88 +241,6 @@ export const ResultScreen = () => {
         return String(ans);
     }).filter((s): s is string => Boolean(s)).join(' * ');
 
-    // const printWithCanvasCapture = useCallback(async (): Promise<void> => {
-    //     const printContent = printableRef.current;
-    //     if (!printContent) return;
-
-    //     try {
-    //         // Create a very small loading indicator that doesn't interfere
-    //         const miniLoader = document.createElement('div');
-    //         miniLoader.style.cssText = `
-    //         position: fixed; top: 10px; right: 10px; background: #333; color: white;
-    //         padding: 4px 8px; border-radius: 3px; font-size: 12px; z-index: 10000;
-    //     `;
-    //         miniLoader.textContent = 'מכין...';
-    //         document.body.appendChild(miniLoader);
-
-    //         // Wait a moment for SVG to be ready
-    //         await new Promise(resolve => setTimeout(resolve, 200));
-
-    //         // Capture the print area as image
-    //         const canvas = await html2canvas(printContent, {
-    //             scale: 2,
-    //             useCORS: true,
-    //             backgroundColor: '#F7F0E6',
-    //             width: printContent.scrollWidth,
-    //             height: printContent.scrollHeight,
-    //         });
-
-    //         const imgDataUrl = canvas.toDataURL('image/png');
-
-    //         // Remove loader
-    //         document.body.removeChild(miniLoader);
-
-    //         const printWindow = window.open('', '_blank');
-    //         if (!printWindow) {
-    //             alert('Popup נחסם! אנא אפשר popups להדפסה.');
-    //             return;
-    //         }
-
-    //         printWindow.document.write(`
-    //         <!DOCTYPE html>
-    //         <html>
-    //         <head>
-    //             <title>הדפסה - ${(answers.name as string) || 'Florigins'}</title>
-    //             <style>
-    //                 @page { size: A4 landscape; margin: 0; }
-    //                 body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    //                 img { max-width: 100%; max-height: 100%; width: auto; height: auto; }
-    //                 @media print { body { margin: 0; padding: 0; } img { width: 100vw; height: 100vh; object-fit: contain; } }
-    //             </style>
-    //         </head>
-    //         <body>
-    //             <img src="${imgDataUrl}" alt="Flower Print" />
-    //             <script>
-    //                 let printAttempted = false;
-    //                 function attemptPrint() {
-    //                     if (printAttempted) return;
-    //                     printAttempted = true;
-    //                     try {
-    //                         window.focus();
-    //                         window.print();
-    //                     } catch (e) {
-    //                         console.log('Print failed:', e);
-    //                     }
-    //                 }
-    //                 window.onafterprint = () => setTimeout(() => window.close(), 500);
-    //                 window.onload = () => setTimeout(attemptPrint, 800);
-    //                 document.addEventListener('keydown', (e) => {
-    //                     if (e.key === 'Escape') window.close();
-    //                 });
-    //                 window.focus();
-    //             </script>
-    //         </body>
-    //         </html>
-    //     `);
-
-    //         printWindow.document.close();
-
-    //     } catch (error) {
-    //         console.error('Canvas print failed:', error);
-    //         alert('ההדפסה נכשלה. אנא נסה שוב.');
-    //     }
-    // }, [answers]);
-
     const printViaIframe = useCallback(async (): Promise<void> => {
         const printContent = printableRef.current;
         if (!printContent) return;
@@ -366,7 +283,7 @@ export const ResultScreen = () => {
                 <head>
                     <title>הדפסה - ${(answers.name as string) || 'Florigins'}</title>
                     <style>
-                        @page { size: A4 landscape; margin: 0; }
+                        @page { size: 150mm 100mm; margin: 0; }
                         * { margin: 0; padding: 0; box-sizing: border-box; }
                         body { margin: 0; padding: 0; background: white; }
                         img { width: 100vw; height: 100vh; object-fit: contain; display: block; }
@@ -503,19 +420,19 @@ export const ResultScreen = () => {
                     position: absolute;
                     left: -9999px;
                     top: 0;
-                    width: 297mm;
-                    height: 210mm;
+                    width: 150mm;
+                    height: 100mm;
                     overflow: visible; 
                 }
 
                 .print-layout {
-                    width: 297mm;
-                    min-height: 210mm;
+                    width: 150mm;
+                    height: 100mm;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
                     align-items: center;
-                    padding: 15mm;
+                    padding: 8mm;
                     box-sizing: border-box;
                     background-color: #F7F0E6;
                     border: 3px solid #000000;
@@ -530,7 +447,7 @@ export const ResultScreen = () => {
                     padding-bottom: 0.5rem;
                     border-bottom: 1px solid #ccc;
                     font-family: 'Heebo', sans-serif;
-                    font-size: 16pt;
+                    font-size: 12pt;
                     letter-spacing: 0.2em;
                     color: #333;
                     margin-bottom: 1rem;
@@ -563,7 +480,7 @@ export const ResultScreen = () => {
 
                 .summary-text {
                     font-family: 'Heebo', sans-serif;
-                    font-size: 14pt;
+                    font-size: 10pt;
                     letter-spacing: 0.05em;
                     color: #333;
                     line-height: 1.3;
