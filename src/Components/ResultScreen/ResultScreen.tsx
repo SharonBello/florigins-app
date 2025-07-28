@@ -246,14 +246,6 @@ export const ResultScreen = () => {
         if (!printContent) return;
 
         try {
-            const miniLoader = document.createElement('div');
-            miniLoader.style.cssText = `
-            position: fixed; top: 10px; right: 10px; background: #333; color: white;
-            padding: 4px 8px; border-radius: 3px; font-size: 12px; z-index: 10000;
-        `;
-            miniLoader.textContent = 'מכין...';
-            document.body.appendChild(miniLoader);
-
             await new Promise(resolve => setTimeout(resolve, 300));
 
             const canvas = await html2canvas(printContent, {
@@ -267,8 +259,6 @@ export const ResultScreen = () => {
             });
 
             const imgDataUrl = canvas.toDataURL('image/png');
-            document.body.removeChild(miniLoader);
-
             // Create hidden iframe
             const iframe = document.createElement('iframe');
             iframe.style.cssText = 'position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px;';
@@ -447,7 +437,7 @@ export const ResultScreen = () => {
                     padding-bottom: 0.5rem;
                     border-bottom: 1px solid #ccc;
                     font-family: 'Heebo', sans-serif;
-                    font-size: 12pt;
+                    font-size: 10pt;
                     letter-spacing: 0.2em;
                     color: #333;
                     margin-bottom: 1rem;
@@ -459,31 +449,28 @@ export const ResultScreen = () => {
                     align-items: center;
                     justify-content: center;
                     width: 100%;
-                    min-height: 300px;
-                    padding: 20px 0;
+                    min-height: 150px;
                 }
 
                 .print-flower-container svg {
                     width: 100%;
                     height: 100%;
-                    max-width: 400px;
-                    max-height: 400px;
+                    max-width: 150px;
+                    max-height: 150px;
                     display: block;
                 }
 
                 .print-footer {
                     width: 100%;
-                    padding-top: 0.5rem;
                     text-align: center;
-                    margin-top: 1rem;
                 }
 
                 .summary-text {
                     font-family: 'Heebo', sans-serif;
-                    font-size: 10pt;
+                    font-size: 8pt;
                     letter-spacing: 0.05em;
                     color: #333;
-                    line-height: 1.3;
+                    line-height: 1;
                 }
             `}
             </style>
